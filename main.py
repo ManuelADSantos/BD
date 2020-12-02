@@ -7,7 +7,7 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 cur = conn.cursor()
 
 # Efectua uma consulta à base de dados
-cur.execute("SELECT * FROM emp;")
+cur.execute("SELECT * FROM utilizador;")
 
 # mostra todos os resultados
 print(cur.fetchall())

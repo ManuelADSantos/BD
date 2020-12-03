@@ -1,5 +1,6 @@
 import psycopg2
-import os
+from passlib.hash import sha256_crypt
+from getpass import getpass
 
 
 # Estabelecer ligação à base de dados
@@ -28,15 +29,21 @@ if(inicio_escolha == 2):
         print("\n----------------------------Registo--------------------------------")
         email = input("Insira o seu endereço de email: \n    ")
         if ("@" in email):
-            print(f"\nEmail inserido:\n    {email}")
+            print(f"Email inserido:\n    {email}")
             break
         else:
             print("\nEndereço de email não válido")
 
     #Registo da Password
-    password = input("\nInsira a sua password:\n    ")
-
-    
+    while(True):
+        password = getpass("\nInsira a sua password:\n    ")
+        password_encriptada = sha256_crypt.hash(password)
+        password_verif = getpass("Confirme a sua password:\n    ")
+        if(sha256_crypt.verify(password_verif ,password_encriptada)):
+            print("\nPassword aceite")
+            break
+        else:
+            print("\nPasswords não correspondem")
 
 
 

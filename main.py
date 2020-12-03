@@ -7,9 +7,12 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 cur = conn.cursor()
 
 #Iniciar sessão
+print("Bem vindo ao NETFLOX")
 print("1 - Login")
 print("2 - Registar")
+iniciar_sessao = input("")
 
+case
 
 
 

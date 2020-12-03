@@ -1,4 +1,7 @@
 import psycopg2
+from passlib.hash import sha256_crypt
+from getpass import getpass
+
 
 # Estabelecer ligação à base de dados
 conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=postgres")
@@ -6,10 +9,41 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Criar cursor
 cur = conn.cursor()
 
-#Iniciar sessão
-print("1 - Login")
-print("2 - Registar")
+#Início=========================================================================
+while True:
+    try:
+        print("----------------------------Início--------------------------------")
+        print("\nBem vind@ ao NETFLOX\n    1 - Login\n    2 - Registar")
+        inicio_escolha = int(input("\nSelecione a opção que deseja: "))
+        if (inicio_escolha == 1 or inicio_escolha == 2):
+            break
+        else:
+            print("!!! Opção inválida !!!")
+    except ValueError:
+        print("!!! Opção inválida !!!")
 
+#Registo========================================================================
+if(inicio_escolha == 2):
+    #Registo do Email
+    while True:
+        print("\n----------------------------Registo--------------------------------")
+        email = input("Insira o seu endereço de email: \n    ")
+        if ("@" in email):
+            print(f"Email inserido:\n    {email}")
+            break
+        else:
+            print("\nEndereço de email não válido")
+
+    #Registo da Password
+    while(True):
+        password = getpass("\nInsira a sua password:\n    ")
+        password_encriptada = sha256_crypt.hash(password)
+        password_verif = getpass("Confirme a sua password:\n    ")
+        if(sha256_crypt.verify(password_verif ,password_encriptada)):
+            print("\nPassword aceite")
+            break
+        else:
+            print("\nPasswords não correspondem")
 
 
 

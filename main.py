@@ -6,12 +6,12 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Criar cursor
 cur = conn.cursor()
 
-print("Login")
-print("Registar")
+#Iniciar sessão
+print("1 - Login")
+print("2 - Registar")
 
 
-# mostra todos os resultados
-print(cur.fetchall())
+
 
 # Fecha a ligação à base de dados
 cur.close()

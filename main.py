@@ -10,9 +10,9 @@ cur = conn.cursor()
 print("Bem vindo ao NETFLOX")
 print("1 - Login")
 print("2 - Registar")
-iniciar_sessao = input("")
+iniciar_sessao = input("\nSelecione a opção que deseja")
 
-case
+
 
 
 

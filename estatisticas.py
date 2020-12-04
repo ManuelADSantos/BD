@@ -13,57 +13,86 @@ estatistica = True
 
 while estatistica:
 
-    print("-------------------------------------Estatísticas:-----------------------------------------------")
-    print("\n Como pretende pesquisar? \n")
+    print("\n-------------------------------------Estatísticas:-----------------------------------------------\n")
 
-    pesquisa = input("""
-                          1 - Tipo
-                          2 - Titulo
-                          3 - Ator
-                          4 - Realizador
-                          5 - Produtor
-                          6 - Ano
-                          7 - Voltar
+    estatisticas = input("""
+                          1 - Número de Clientes
+                          2 - Número de artigos
+                          3 - Número de artigos por tipo
+                          4 - Valor total dos artigos alugados no momento atual
+                          5 - Valor total dos alugueres desde sempre
+                          6 - Cliente com mais alugueres
+                          7 - Artigo mais alugado
+                          8- Voltar
 
-    Pesquisa por: """)
+    Ver: """)
     print("\n")
 
+    # Numero de clientes
+    if estatisticas == "1":
+        cur.execute("SELECT count(*) from cliente")
 
-# Numero de clientes
-nclientes = cur.execute("SELECT count(*) from cliente")
+        nclientes = cur.fetchone()
 
-print(nclientes)
+        while nclientes is not None:
+            print(nclientes)
+            nclientes = cur.fetchone()
 
-#Numero de artigos
-nartigos = cur.execute("SELECT count(*) from artigo")
+    #Numero de artigos
+    elif estatisticas == "2":
+        cur.execute("SELECT count(*) from artigo")
 
-print(nartigos)
+        nartigos = cur.fetchone()
+        print(nartigos)
+       # while nartigos is not None:
+            #print(nartigos)
+           # nartigos = cur.fetchone()
 
-#Numero de artigos por tipo
-nartigos_tipo = cur.execute("SELECT count(tipo) from artigo")
+    #Numero de artigos por tipo
+    elif estatisticas == "3":
 
-print(nartigos_tipo)
+        pesqtipo = input("Qual tipo?: ")
 
-#Valor total dos artigos alugados no momento atual
-valortotal = cur.execute("SELECT count(preco) from historico_precos, aluguer where atual = true AND ativo = true")
+        cur.execute("SELECT count(tipo) from artigo where tipo = %s", pesqtipo)
 
-print(valortotal)
+        nartigos_tipo = cur.fetchone()
+        print(nartigos_tipo)
 
-#Valor total dos alugueres desde sempre
-alugueres = cur.execute("SELECT count(preco) from historico_precos")
+    #Valor total dos artigos alugados no momento atual
+    elif estatisticas == "4":
+        cur.execute("SELECT count(preco) from historico_precos, aluguer where atual = true AND ativo = true")
 
-print(alugueres)
+        valortotal = cur.fetchone()
+        print(valortotal)
 
-#Cliente com mais alugueres
+    #Valor total dos alugueres desde sempre
+    elif estatisticas == "5":
 
-clientemvp = cur.execute("SELECT nome from utilizador, aluguer where ativo = true AND ativo=max(ativo) ")
+        cur.execute("SELECT count(preco) from historico_precos")
 
-print(clientemvp)
+        alugueres = cur.fetchone()
+        print(alugueres)
 
-#Artigo mais alugado
-artigoalugado = cur.execute("SELECT titulo from artigo, aluguer where ativo = max(ativo)")
+    #Cliente com mais alugueres
+    elif estatisticas == "6":
+        cur.execute("SELECT nome from utilizador where aluguer.ativo = true AND max(ativo) ")
 
-print(artigoalugado)
+        clientemvp =cur.fetchone()
+        print(clientemvp)
+
+    #Artigo mais alugado
+    elif estatisticas == "7":
+        cur.execute("SELECT titulo from artigo where aluguer = max(*)")
+
+        artigoalugado = cur.fetchone()
+        print(artigoalugado)
+
+    elif estatisticas == "8":
+        estatistica = False
+
+    else:
+        print("Inválido")
+        print("Tenta outra vez")
 # Fecha a ligação à base de dados
 cur.close()
 conn.close()

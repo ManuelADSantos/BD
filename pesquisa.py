@@ -1,4 +1,9 @@
 # PESQUISA
+#Deve ser possível especificar critérios de ordenação dos resultados.
+# Esta funcionalidade deve ser aplicável em dois contextos:
+# i) a todos os artigos no sistema;
+# ii) aos artigos neste momento alugados pelo cliente.
+
 
 import psycopg2
 
@@ -10,11 +15,11 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Cria um objecto (cursor) que permite executar operações sobre a base de dados
 cur = conn.cursor()
 
-pesquisa = True
+pesquisageral = True
 
-while pesquisa:
+while pesquisageral:
 
-    print("-------------------------------------Pesquisa:-----------------------------------------------")
+    print("-------------------------------Pesquisa a todos os artigos do sistema:-----------------------------------------------")
     print("\n Como pretende pesquisar? \n")
 
     pesquisa = input("""
@@ -107,7 +112,7 @@ while pesquisa:
 
     elif pesquisa == "7":
 
-        pesquisa = False
+        pesquisageral = False
 
     else:
         print("Inválido")

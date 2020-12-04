@@ -48,7 +48,7 @@ while pesquisa:
 
         cur.execute("SELECT titulo from artigo where titulo = %s ORDER by titulo ASC", titulo2)
 
-        p_titulo = cur.fetchall()
+        p_titulo = cur.fetchone()
 
         while p_titulo is not None:
             print(p_titulo)
@@ -58,7 +58,7 @@ while pesquisa:
 
     elif pesquisa == "3":
 
-        titulo3 = str(input("Pesquisa por Ator: \n"))
+        titulo3 = input("Pesquisa por Ator: \n")
 
         p_atores = cur.execute("SELECT titulo from artigo where ator = %s  ORDER by titulo ASC", titulo3)
 
@@ -66,9 +66,9 @@ while pesquisa:
 
     elif pesquisa == "4":
 
-        titulo4 = input(str("Pesquisa por realizador: \n"))
+        titulo4 = input("Pesquisa por realizador: \n")
 
-        cur.execute("SELECT titulo from artigo where realizador = %s ORDER by titulo ASC", str(titulo4))
+        cur.execute("SELECT titulo from artigo where realizador = %s ORDER by titulo ASC", titulo4)
 
         p_realizador = cur.fetchall()
 

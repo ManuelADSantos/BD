@@ -9,6 +9,26 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Cria um objecto (cursor) que permite executar operações sobre a base de dados
 cur = conn.cursor()
 
+estatistica = True
+
+while estatistica:
+
+    print("-------------------------------------Estatísticas:-----------------------------------------------")
+    print("\n Como pretende pesquisar? \n")
+
+    pesquisa = input("""
+                          1 - Tipo
+                          2 - Titulo
+                          3 - Ator
+                          4 - Realizador
+                          5 - Produtor
+                          6 - Ano
+                          7 - Voltar
+
+    Pesquisa por: """)
+    print("\n")
+
+
 # Numero de clientes
 nclientes = cur.execute("SELECT count(*) from cliente")
 

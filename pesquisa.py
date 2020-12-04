@@ -73,7 +73,7 @@ while pesquisageral:
 
         titulo4 = input("Pesquisa por realizador: \n")
 
-        cur.execute(f"SELECT titulo from artigo where realizador like '%{titulo4}' ORDER by titulo ASC")
+        cur.execute("SELECT titulo from artigo where realizador like '%%s' ORDER by titulo ASC",titulo4)
 
         p_realizador = cur.fetchall()
 

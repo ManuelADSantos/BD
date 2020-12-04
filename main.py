@@ -1,4 +1,5 @@
 import psycopg2
+import psycopg2.extras
 from passlib.hash import sha256_crypt
 from getpass import getpass
 

@@ -28,11 +28,13 @@ if(inicio_escolha == 2):
     while True:
         print("\n----------------------------Registo--------------------------------")
         email = input("Insira o seu endereço de email: \n    ")
-        if ("@" in email):
+        cur.execute(f"SELECT COUNT(email) from utilizador where email like '%{email}'")
+        email_verif = cur.fetchone()
+        if ("@" in email and email_verif[0]==0 and ' ' not in email):
             print(f"Email inserido:\n    {email}")
             break
         else:
-            print("\nEndereço de email não válido")
+            print("\nEndereço de email inválido")
 
     #Registo da Password
     while(True):
@@ -45,7 +47,9 @@ if(inicio_escolha == 2):
         else:
             print("\nPasswords não correspondem")
 
-
+    #Registo do nome
+    nickname = input("Insira o seu nome: \n    ")
+    print(f"Nome inserido:\n    {nickname}")
 
 # Fecha a ligação à base de dados
 cur.close()

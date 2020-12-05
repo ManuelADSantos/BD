@@ -3,12 +3,15 @@ import psycopg2.extras
 from passlib.hash import sha256_crypt
 from getpass import getpass
 
+
 #==========================================================================================================================
 # Estabelecer ligação à base de dados
 conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=postgres")
 
 # Criar cursor
 cur = conn.cursor()
+
+
 #==========================================================================================================================
 #Início
 def inicio():
@@ -25,6 +28,26 @@ def inicio():
                 print("!!! Opção inválida !!!")
         except ValueError:
             print("!!! Opção inválida !!!")
+
+
+#==========================================================================================================================
+#Login
+def login():
+    print("\n----------------------------Login--------------------------------")
+    while True:
+        email = input("\nEmail:   ")
+        cur.execute(f"SELECT COUNT(email) from utilizador where email like '%{email}'")
+        email_verif = cur.fetchone()
+        if (email_verif[0]==0):
+            password = getpass("\n\nPassword:   ")
+            password_encriptada = sha256_crypt.hash(password)
+            if(sha256_crypt.verify(password_verif ,password_encriptada)):
+                print("Password aceite\n")
+                break
+            else:
+                print("Password errada")
+        else:
+            print("\nEndereço de email inválido")
 
 
 #==========================================================================================================================
@@ -59,6 +82,7 @@ def registo():
 
     #De volta ao início
     return
+
 
 #==========================================================================================================================
 #Procedimento

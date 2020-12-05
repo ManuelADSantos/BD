@@ -28,7 +28,7 @@ def menu_pesquisar():
         print("----------------------MENU PESQUISA---------------------")
         print("\n Onde pretende pesquisar? \n")
 
-        pesquisar = input(""" 
+        pesquisar = input("""
                             1 - Pesquisa a todos os artigos do Sistema
                             2 - Pesquisa Artigos Alugados
                             V - Voltar
@@ -72,7 +72,7 @@ def pesquisa_geral():
                               4 - Realizador
                               5 - Produtor
                               6 - Ano
-                              V - Voltar MENU PESQUISA 
+                              V - Voltar MENU PESQUISA
         Pesquisa por: """)
 
         if pesquisa == "V" or pesquisa == "v":
@@ -86,8 +86,8 @@ def pesquisa_geral():
             ordem = input(""" Ordenação dos resultados:
 
                                   C - ordem crescente
-                                  D - ordem decrescente 
-                
+                                  D - ordem decrescente
+
             Resposta: """)
 
         print("\n")
@@ -276,7 +276,7 @@ def pesquisa_user():
                               4 - Realizador
                               5 - Produtor
                               6 - Ano
-                              V - Voltar MENU PESQUISA 
+                              V - Voltar MENU PESQUISA
         Pesquisa por: """)
 
         if pesquisa == "V" or pesquisa == "v":
@@ -290,7 +290,7 @@ def pesquisa_user():
             ordem = input(""" Ordenação dos resultados:
 
                                   C - ordem crescente
-                                  D - ordem decrescente 
+                                  D - ordem decrescente
 
             Resposta: """)
 

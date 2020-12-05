@@ -54,6 +54,8 @@ while pesquisageral:
     print("\n")
 
     # .........................................ORDEM CRESCENTE.....................................................
+
+    #--------------------------------------------PESQUISA POR TIPO-------------------------------------------------
     if pesquisa == "1" and ordem == "C":
 
         titulo1 = input("Pesquisa por tipo (ordem crescente): \n")
@@ -71,6 +73,7 @@ while pesquisageral:
             print("->", *p_tipo)
             p_tipo = cur.fetchone()
 
+    # --------------------------------------------PESQUISA POR TITULO-------------------------------------------------
     elif pesquisa == "2" and ordem == "C":
 
         titulo2 = input("Pesquisa por título (ordem crescente): \n")
@@ -87,7 +90,7 @@ while pesquisageral:
             print("->", *p_titulo)
             p_titulo = cur.fetchone()
 
-
+    # --------------------------------------------PESQUISA POR ATOR-------------------------------------------------
     elif pesquisa == "3" and ordem == "C":
 
         titulo3 = input("Pesquisa por Ator (ordem crescente): \n")
@@ -98,6 +101,7 @@ while pesquisageral:
 
         print(p_atores)
 
+    # --------------------------------------------PESQUISA POR REALIZADOR-------------------------------------------------
     elif pesquisa == "4" and ordem == "C":
 
         titulo4 = input("Pesquisa por realizador (ordem crescente): \n")
@@ -115,6 +119,7 @@ while pesquisageral:
             print("->", *p_realizador)
             p_realizador = cur.fetchone()
 
+    # --------------------------------------------PESQUISA POR PRODUTOR-------------------------------------------------
     elif pesquisa == "5" and ordem == "C":
 
         titulo5 = input("Pesquisa por produtor (ordem crescente): \n")
@@ -132,6 +137,7 @@ while pesquisageral:
             print(p_produtor)
             p_produtor = cur.fetchone()
 
+    # --------------------------------------------PESQUISA POR ANO-------------------------------------------------
     elif pesquisa == "6" and ordem == "C":
 
         titulo6 = int(input("Pesquisa por Ano (ordem crescente): \n"))
@@ -150,6 +156,7 @@ while pesquisageral:
             p_ano = cur.fetchone()
 
     # ..........................................ORDEM DECRESCENTE..................................................
+    # --------------------------------------------PESQUISA POR TIPO-------------------------------------------------
     elif pesquisa == "1" and ordem == "D":
 
         titulo1 = input("Pesquisa por tipo (ordem decrescente): \n")
@@ -167,6 +174,7 @@ while pesquisageral:
             print("->", *p_tipo)
             p_tipo = cur.fetchone()
 
+    # --------------------------------------------PESQUISA POR TITULO-------------------------------------------------
     elif pesquisa == "2" and ordem == "D":
 
         titulo2 = input("Pesquisa por título (ordem decrescente): \n")
@@ -183,7 +191,7 @@ while pesquisageral:
             print("->", *p_titulo)
             p_titulo = cur.fetchone()
 
-
+    # --------------------------------------------PESQUISA POR ATOR-------------------------------------------------
     elif pesquisa == "3" and ordem == "D":
 
         titulo3 = input("Pesquisa por Ator (ordem decrescente): \n")
@@ -194,7 +202,7 @@ while pesquisageral:
 
         print(p_atores)
 
-
+    # --------------------------------------------PESQUISA POR RALIZADOR-------------------------------------------------
     elif pesquisa == "4" and ordem == "D":
 
         titulo4 = input("Pesquisa por realizador (ordem decrescente): \n")
@@ -213,7 +221,7 @@ while pesquisageral:
 
             p_realizador = cur.fetchone()
 
-
+    # --------------------------------------------PESQUISA POR PRODUTOR-------------------------------------------------
     elif pesquisa == "5" and ordem == "D":
 
         titulo5 = input("Pesquisa por produtor (ordem decrescente): \n")
@@ -232,7 +240,7 @@ while pesquisageral:
 
             p_produtor = cur.fetchone()
 
-
+    # --------------------------------------------PESQUISA POR ANO-------------------------------------------------
     elif pesquisa == "6" and ordem == "D":
 
         titulo6 = int(input("Pesquisa por Ano (ordem decrescente): \n"))

@@ -36,18 +36,22 @@ def login():
     print("\n----------------------------Login--------------------------------")
     while True:
         email = input("\nEmail:   ")
-        cur.execute(f"SELECT COUNT(email) from utilizador where email like '%{email}'")
+        cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}'")
         email_verif = cur.fetchone()
-        if (email_verif[0]==0):
-            password = getpass("\n\nPassword:   ")
-            password_encriptada = sha256_crypt.hash(password)
-            if(sha256_crypt.verify(password_verif ,password_encriptada)):
-                print("Password aceite\n")
-                break
-            else:
-                print("Password errada")
+        if (email_verif[0]==1):
+            while True:
+                password = getpass("\n\nPassword:   ")
+                cur.execute(f"SELECT password FROM utilizador WHERE email LIKE '%{email}'")
+                password_verif = cur.fetchone()
+                if(sha256_crypt.verify(password ,password_verif[0])):
+                    print("Inicio de sessão bem sucedida\n")
+                    break
+                else:
+                    print("Password errada")
+            break
         else:
             print("\nEndereço de email inválido")
+    return
 
 
 #==========================================================================================================================

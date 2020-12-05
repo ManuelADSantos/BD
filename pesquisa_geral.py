@@ -62,6 +62,9 @@ while pesquisageral:
 
         p_tipo = cur.fetchone()
 
+        if p_tipo is None:
+            print("Resultado não encontrado!")
+
         while p_tipo is not None:
             print(p_tipo)
             p_tipo = cur.fetchone()
@@ -73,6 +76,9 @@ while pesquisageral:
         cur.execute(f"SELECT titulo FROM artigo WHERE titulo like '%{titulo2}' ORDER by titulo ASC;")
 
         p_titulo = cur.fetchone()
+
+        if p_titulo is None:
+            print("Resultado não encontrado!")
 
         while p_titulo is not None:
             print(p_titulo)
@@ -95,6 +101,9 @@ while pesquisageral:
 
         p_realizador = cur.fetchone()
 
+        if p_realizador is None:
+            print("Resultado não encontrado!")
+
         while p_realizador is not None:
             print(p_realizador)
             p_realizador = cur.fetchone()
@@ -107,6 +116,9 @@ while pesquisageral:
 
         p_produtor = cur.fetchone()
 
+        if p_produtor is None:
+            print("Resultado não encontrado!")
+
         while p_produtor is not None:
             print(p_produtor)
             p_produtor = cur.fetchone()
@@ -118,6 +130,9 @@ while pesquisageral:
         cur.execute(f"SELECT Titulo from Artigo where Ano like '%{titulo6}' ORDER by titulo ASC;")
 
         p_ano: object = cur.fetchall()
+
+        if p_ano is None:
+            print("Resultado não encontrado!")
 
         while p_ano is not None:
             print(p_ano)

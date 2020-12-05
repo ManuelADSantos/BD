@@ -33,7 +33,7 @@ while pesquisageral:
                               4 - Realizador
                               5 - Produtor
                               6 - Ano
-                              V - Voltar MENU PESQUISA 
+                              V - Voltar MENU PESQUISA
         Pesquisa por: """)
 
     if pesquisa == "V" or pesquisa == "v":
@@ -47,7 +47,7 @@ while pesquisageral:
         ordem = input(""" Ordenação dos resultados:
 
                                   C - ordem crescente
-                                  D - ordem decrescente 
+                                  D - ordem decrescente
 
             Resposta: """)
 

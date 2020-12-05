@@ -58,15 +58,19 @@ while pesquisageral:
 
         titulo1 = input("Pesquisa por tipo(ordem crescente): \n")
 
-        cur.execute("SELECT titulo from artigo where tipo like '%%s' ORDER by titulo ASC", titulo1)
+        cur.execute(f"SELECT titulo from artigo where tipo like '%{titulo1}' ORDER by titulo ASC;")
 
-        print(cur.fetchall())
+        p_tipo = cur.fetchone()
+
+        while p_tipo is not None:
+            print(p_tipo)
+            p_tipo = cur.fetchone()
 
     elif pesquisa == "2" and ordem == "C":
 
         titulo2 = input("Pesquisa por título(ordem crescente): \n")
 
-        cur.execute(f"SELECT * FROM artigo WHERE titulo like '%{titulo2}' ORDER by titulo ASC;")
+        cur.execute(f"SELECT titulo FROM artigo WHERE titulo like '%{titulo2}' ORDER by titulo ASC;")
 
         p_titulo = cur.fetchone()
 
@@ -87,21 +91,19 @@ while pesquisageral:
 
         titulo4 = input("Pesquisa por realizador(ordem crescente): \n")
 
-        cur.execute("SELECT titulo from artigo where realizador like '%%s' ORDER by titulo ASC", titulo4)
+        cur.execute(f"SELECT titulo from artigo where realizador like '%{titulo4}' ORDER by titulo ASC;")
 
         p_realizador = cur.fetchone()
-        print(p_realizador)
 
-        # while p_realizador is not None:
-        #   print(p_realizador)
-        #  p_realizador = cur.fetchone()
-        # conn.commit()
+        while p_realizador is not None:
+            print(p_realizador)
+            p_realizador = cur.fetchone()
 
     elif pesquisa == "5" and ordem == "C":
 
         titulo5 = input("Pesquisa por produtor(ordem crescente): \n")
 
-        cur.execute("SELECT titulo from artigo where produtor like '%%s' ORDER by titulo ASC", titulo5)
+        cur.execute(f"SELECT titulo from artigo where produtor like '%{titulo5}' ORDER by titulo ASC;")
 
         p_produtor = cur.fetchone()
 
@@ -109,13 +111,11 @@ while pesquisageral:
             print(p_produtor)
             p_produtor = cur.fetchone()
 
-        conn.commit()
-
     elif pesquisa == "6" and ordem == "C":
 
         titulo6 = int(input("Pesquisa por Ano(ordem crescente): \n"))
 
-        cur.execute("SELECT Titulo from Artigo where Ano like '%%d' ORDER by titulo ASC", titulo6)
+        cur.execute(f"SELECT Titulo from Artigo where Ano like '%{titulo6}' ORDER by titulo ASC;")
 
         p_ano: object = cur.fetchall()
 
@@ -130,7 +130,12 @@ while pesquisageral:
 
         titulo1 = input("Pesquisa por tipo(ordem decrescente): \n")
 
-        cur.execute("SELECT titulo from artigo where tipo like '%%s' ORDER by titulo ASC", titulo1)
+        cur.execute(f"SELECT titulo from artigo where tipo like '%{titulo1}' ORDER by titulo ASC;")
+
+        for linha in cur.fetchall():
+            titulo = linha
+            print(titulo)
+
 
         p_tipo = cur.fetchone()
 
@@ -209,6 +214,10 @@ while pesquisageral:
     else:
         print("Inválido")
         print("Tenta outra vez")
+
+# Fecha a ligação à base de dados
+cur.close()
+conn.close()
 
 # Fecha a ligação à base de dados
 cur.close()

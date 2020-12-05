@@ -60,12 +60,7 @@ while pesquisageral:
 
         cur.execute("SELECT titulo from artigo where tipo like '%%s' ORDER by titulo ASC", titulo1)
 
-        p_tipo = cur.fetchone()
-
-        while p_tipo is not None:
-            print(p_tipo)
-            p_tipo = cur.fetchone()
-        # conn.commit()
+        print(cur.fetchall())
 
     elif pesquisa == "2" and ordem == "C":
 
@@ -79,7 +74,7 @@ while pesquisageral:
             print(p_titulo)
             p_titulo = cur.fetchone()
 
-        # conn.commit()
+        conn.commit()
 
     elif pesquisa == "3" and ordem == "C":
 

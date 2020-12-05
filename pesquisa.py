@@ -17,7 +17,7 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 cur = conn.cursor()
 
 
-# MENU PESQUISAR
+#-----------------------------------------------MENU PESQUISAR-----------------------------------------------------
 
 def menu_pesquisar():
 
@@ -456,6 +456,7 @@ def pesquisa_user():
             print("Voltar ao MENU PESQUISA")
 
         else:
+            ordenar == False
             print("Inválido")
             print("Tenta outra vez")
 

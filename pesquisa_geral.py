@@ -95,11 +95,16 @@ while pesquisageral:
 
         titulo3 = input("Pesquisa por Ator (ordem crescente): \n")
 
-        p_atores = cur.execute("SELECT titulo from artigo where ator like '%%s'  ORDER by titulo ASC", titulo3)
+        cur.execute(f"SELECT artigo.titulo from artigo join artigo_atores on artigo.id = artigo_atores.artigo_id join atores on atores.id= artigo_atores.atores_id where atores.nome like '%{titulo3}' ORDER BY titulo ASC;")
 
-        print("Título (ordem crescente):")
+        p_atores = cur.fetchone()
 
-        print(p_atores)
+        if p_atores is None:
+            print("Resultado não encontrado!")
+
+        while p_atores is not None:
+            print("->", *p_atores)
+            p_atores = cur.fetchone()
 
     # --------------------------------------------PESQUISA POR REALIZADOR-------------------------------------------------
     elif pesquisa == "4" and ordem == "C":
@@ -140,9 +145,9 @@ while pesquisageral:
     # --------------------------------------------PESQUISA POR ANO-------------------------------------------------
     elif pesquisa == "6" and ordem == "C":
 
-        titulo6 = int(input("Pesquisa por Ano (ordem crescente): \n"))
+        titulo6 = input("Pesquisa por Ano (ordem crescente): \n")
 
-        cur.execute(f"SELECT Titulo from Artigo where Ano like '%{titulo6}' ORDER by titulo ASC;")
+        cur.execute(f"SELECT Titulo from Artigo where Ano = '{titulo6}' ORDER by titulo ASC;")
 
         print("Título (ordem crescente):")
 
@@ -196,11 +201,18 @@ while pesquisageral:
 
         titulo3 = input("Pesquisa por Ator (ordem decrescente): \n")
 
-        p_atores = cur.execute("SELECT titulo from artigo where ator like '%%s'  ORDER by titulo DESC", titulo3)
+        cur.execute(f"SELECT artigo.titulo from artigo join artigo_atores on artigo.id = artigo_atores.artigo_id join atores on atores.id= artigo_atores.atores_id where atores.nome like '%{titulo3}' ORDER BY titulo DESC;")
 
         print("Título (ordem decrescente):")
 
-        print(p_atores)
+        p_atores = cur.fetchone()
+
+        if p_atores is None:
+            print("Resultado não encontrado!")
+
+        while p_atores is not None:
+            print("->", *p_atores)
+            p_atores = cur.fetchone()
 
     # --------------------------------------------PESQUISA POR RALIZADOR-------------------------------------------------
     elif pesquisa == "4" and ordem == "D":
@@ -243,9 +255,9 @@ while pesquisageral:
     # --------------------------------------------PESQUISA POR ANO-------------------------------------------------
     elif pesquisa == "6" and ordem == "D":
 
-        titulo6 = int(input("Pesquisa por Ano (ordem decrescente): \n"))
+        titulo6 = input("Pesquisa por Ano (ordem decrescente): \n")
 
-        cur.execute(f"SELECT Titulo from Artigo where Ano like '%{titulo6}' ORDER by titulo DESC;")
+        cur.execute(f"SELECT Titulo from Artigo where Ano like '{titulo6}' ORDER by titulo DESC;")
 
         print("Título (ordem decrescente):")
 
@@ -258,6 +270,13 @@ while pesquisageral:
             print("->", *p_ano)
 
             p_ano = cur.fetchone()
+
+    elif pesquisa == "V" or pesquisa == "v":
+        print("Voltar ao MENU PESQUISA")
+
+    else:
+        print("Inválido")
+        print("Tenta outra vez")
 
 # Fecha a ligação à base de dados
 cur.close()

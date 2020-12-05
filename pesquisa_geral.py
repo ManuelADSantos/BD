@@ -90,7 +90,7 @@ while pesquisageral:
             print("->", *p_titulo)
             p_titulo = cur.fetchone()
 
-    # --------------------------------------------PESQUISA POR ATOR-------------------------------------------------
+    # --------------------------------------------PESQUISA POR ATOR--------------------------------------------------
     elif pesquisa == "3" and ordem == "C":
 
         titulo3 = input("Pesquisa por Ator (ordem crescente): \n")

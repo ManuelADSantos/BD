@@ -66,7 +66,7 @@ while pesquisageral:
 
         titulo2 = input("Pesquisa por título(ordem crescente): \n")
 
-        cur.execute("SELECT titulo from artigo where titulo like '%%s' ORDER by titulo ASC", titulo2)
+        cur.execute(f"SELECT * FROM artigo WHERE titulo like '%{titulo2}' ORDER by titulo ASC;")
 
         p_titulo = cur.fetchone()
 
@@ -74,7 +74,6 @@ while pesquisageral:
             print(p_titulo)
             p_titulo = cur.fetchone()
 
-        conn.commit()
 
     elif pesquisa == "3" and ordem == "C":
 
@@ -210,3 +209,7 @@ while pesquisageral:
     else:
         print("Inválido")
         print("Tenta outra vez")
+
+# Fecha a ligação à base de dados
+cur.close()
+conn.close()

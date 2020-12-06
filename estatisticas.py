@@ -60,19 +60,44 @@ while estatistica:
     #------------------------------------------Numero de artigos por tipo-----------------------------------------------
     elif estatisticas == "3":
 
-        pesqtipo = input("Qual tipo?: ")
+        cur.execute("SELECT count(tipo) from artigo where tipo like 'filme';")
 
-        cur.execute(f"SELECT count(tipo) from artigo where tipo like '%{pesqtipo}';")
+        print("Número de Filmes:" )
 
-        print("Numéro de artigos do TIPO:", pesqtipo)
-        nartigos_tipo = cur.fetchone()
+        nartigos_filme = cur.fetchone()
 
-        if nartigos_tipo is None:
+        if nartigos_filme is None:
             print("Resultado não encontrado!")
 
-        while nartigos_tipo is not None:
-            print("->", *nartigos_tipo)
-            nartigos_tipo = cur.fetchone()
+        while nartigos_filme is not None:
+            print("->", *nartigos_filme)
+            nartigos_filme = cur.fetchone()
+
+        cur.execute("SELECT count(tipo) from artigo where tipo like 'serie';")
+
+        print("Número de Séries:")
+
+        nartigos_serie = cur.fetchone()
+
+        if nartigos_serie is None:
+            print("Resultado não encontrado!")
+
+        while nartigos_serie is not None:
+            print("->", *nartigos_serie)
+            nartigos_serie = cur.fetchone()
+
+        cur.execute("SELECT count(tipo) from artigo where tipo like 'documentario';")
+
+        print("Número de Documentários:")
+
+        nartigos_doc = cur.fetchone()
+
+        if nartigos_doc is None:
+            print("Resultado não encontrado!")
+
+        while nartigos_doc is not None:
+            print("->", *nartigos_doc)
+            nartigos_doc = cur.fetchone()
 
     #-----------------------------------Valor total dos artigos alugados no momento atual-------------------------------
     elif estatisticas == "4":

@@ -2,6 +2,7 @@ import psycopg2
 import psycopg2.extras
 from passlib.hash import sha256_crypt
 from getpass import getpass
+import os
 
 
 #==========================================================================================================================
@@ -31,11 +32,13 @@ def inicio():
                         |  |   \     |
                         |__|    \____|
                 """)
-            print("""\n                    Bem vind@ ao NETFLOX\n
+            print("""\n\t\t     Bem vind@ ao NETFLOX\n
                           1 - Login\n
                         2 - Registar\n
                           3 - Sair\n\n
                           ESCOLHA""")
+
+            #Escolha da ação a tomar
             inicio_escolha = int(input("\n\t\t\t     "))
             if (inicio_escolha == 1):       #Login
                 login()
@@ -44,7 +47,8 @@ def inicio():
             elif(inicio_escolha == 3):      #Sair
                 return
             else:
-                print(" ")
+                print("")
+        #Se não for introduzido um número
         except ValueError:
             print(" ")
 

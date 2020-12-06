@@ -44,12 +44,13 @@ while pesquisageral:
 
     # especificar critérios de ordenação dos resultados
     if ordenar == True:
+
         ordem = input(""" Ordenação dos resultados:
 
                                   C - ordem crescente
                                   D - ordem decrescente
 
-            ORDEM(C|D): """)
+        ORDEM(C|D): """)
 
     print("\n")
 
@@ -145,19 +146,27 @@ while pesquisageral:
     # --------------------------------------------PESQUISA POR ANO-------------------------------------------------
     elif pesquisa == "6" and ordem == "C":
 
-        titulo6 = input("Pesquisa por Ano (ordem crescente): \n")
+        while True:
+            try:
+                titulo6 = int(input("Pesquisa por Ano (ordem crescente): \n"))
+            except ValueError:
+                print("INSIRA UM ANO!")
+                continue
+            else:
+                break
 
-        cur.execute(f"SELECT Titulo from Artigo where Ano = '{titulo6}' ORDER by titulo ASC;")
+        cur.execute(f"SELECT titulo from artigo where ano = '{titulo6}' ORDER by titulo ASC;")
 
         print("Título (ordem crescente):")
 
-        p_ano: object = cur.fetchall()
+        p_ano = cur.fetchone()
 
         if p_ano is None:
             print("Resultado não encontrado!")
 
         while p_ano is not None:
             print("->", *p_ano)
+
             p_ano = cur.fetchone()
 
     # ..........................................ORDEM DECRESCENTE..................................................
@@ -255,13 +264,20 @@ while pesquisageral:
     # --------------------------------------------PESQUISA POR ANO-------------------------------------------------
     elif pesquisa == "6" and ordem == "D":
 
-        titulo6 = input("Pesquisa por Ano (ordem decrescente): \n")
+        while True:
+            try:
+                titulo6 = int(input("Pesquisa por Ano (ordem decrescente): \n"))
+            except ValueError:
+                print("INSIRA UM ANO!")
+                continue
+            else:
+                break
 
-        cur.execute(f"SELECT Titulo from Artigo where Ano like '{titulo6}' ORDER by titulo DESC;")
+        cur.execute(f"SELECT titulo from artigo where ano = '{titulo6}' ORDER by titulo DESC;")
 
         print("Título (ordem decrescente):")
 
-        p_ano: object = cur.fetchall()
+        p_ano = cur.fetchone()
 
         if p_ano is None:
             print("Resultado não encontrado!")
@@ -275,8 +291,8 @@ while pesquisageral:
         print("Voltar ao MENU PESQUISA")
 
     else:
-        print("Inválido")
-        print("Tenta outra vez")
+        print("Inválido!")
+        print("Tenta outra vez \n")
 
 # Fecha a ligação à base de dados
 cur.close()

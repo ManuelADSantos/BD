@@ -18,16 +18,18 @@ def inicio():
     while True:
         try:
             print("----------------------------Início--------------------------------")
-            print("\nBem vind@ ao NETFLOX\n    1 - Login\n    2 - Registar")
+            print("\nBem vind@ ao NETFLOX\n    1 - Login\n    2 - Registar\n    3 - Sair")
             inicio_escolha = int(input("\nSelecione a opção que deseja: "))
             if (inicio_escolha == 1):       #Login
                 login()
             elif(inicio_escolha == 2):      #Registo
                 registo()
+            elif(inicio_escolha == 3):      #Sair
+                return
             else:
-                print("!!! Opção inválida !!!")
+                print(" ")
         except ValueError:
-            print("!!! Opção inválida !!!")
+            print(" ")
 
 
 #==========================================================================================================================
@@ -35,19 +37,19 @@ def inicio():
 def login():
     print("\n----------------------------Login--------------------------------")
     while True:
-        email = input("\nEmail:   ")
+        email = input("\nEmail   ")
         cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}'")
         email_verif = cur.fetchone()
         if (email_verif[0]==1):
             while True:
-                password = getpass("\n\nPassword:   ")
+                password = getpass("\nPassword   ")
                 cur.execute(f"SELECT password FROM utilizador WHERE email LIKE '%{email}'")
                 password_verif = cur.fetchone()
                 if(sha256_crypt.verify(password ,password_verif[0])):
-                    print("Inicio de sessão bem sucedida\n")
+                    print("\nInicio de sessão bem sucedida\n")
                     break
                 else:
-                    print("Password errada")
+                    print("\nPassword errada")
             break
         else:
             print("\nEndereço de email inválido")

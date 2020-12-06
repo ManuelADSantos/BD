@@ -22,7 +22,7 @@ utilizador_atual = 0    #Utilizador com login efetuado
 def inicio():
     while True:
         try:
-            print("""----------------------------Início--------------------------------
+            print("""\n----------------------------Início--------------------------------
                          ____      __
                         |    \    |  |
                         |     \   |  |
@@ -50,7 +50,7 @@ def inicio():
                 print("")
         #Se não for introduzido um número
         except ValueError:
-            print(" ")
+            print("")
 
 
 #==========================================================================================================================
@@ -58,12 +58,12 @@ def inicio():
 def login():
     print("\n----------------------------Login--------------------------------")
     while True:
-        email = input("\nEmail   ")
+        email = input("\n\t\t\t || Email ||\n\t\t ")
         cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}'")
         email_verif = cur.fetchone()
         if (email_verif[0]==1):
             while True:
-                password = getpass("\nPassword   ")
+                password = getpass("\n\t\t        || Password ||\n\t\t\t     ")
                 cur.execute(f"SELECT password FROM utilizador WHERE email LIKE '%{email}'")
                 password_verif = cur.fetchone()
                 if(sha256_crypt.verify(password ,password_verif[0])):

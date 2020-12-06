@@ -11,15 +11,32 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Criar cursor
 cur = conn.cursor()
 
+#==========================================================================================================================
+#Variáveis globais
+utilizador_atual = 0    #Utilizador com login efetuado
+
 
 #==========================================================================================================================
-#Início
+#Início/Ecrã inicial
 def inicio():
     while True:
         try:
-            print("----------------------------Início--------------------------------")
-            print("\nBem vind@ ao NETFLOX\n    1 - Login\n    2 - Registar\n    3 - Sair")
-            inicio_escolha = int(input("\nSelecione a opção que deseja: "))
+            print("""----------------------------Início--------------------------------
+                         ____      __
+                        |    \    |  |
+                        |     \   |  |
+                        |  |\  \  |  |
+                        |  | \  \ |  |
+                        |  |  \  \|  |
+                        |  |   \     |
+                        |__|    \____|
+                """)
+            print("""\n                    Bem vind@ ao NETFLOX\n
+                          1 - Login\n
+                        2 - Registar\n
+                          3 - Sair\n\n
+                          ESCOLHA""")
+            inicio_escolha = int(input("\n\t\t\t     "))
             if (inicio_escolha == 1):       #Login
                 login()
             elif(inicio_escolha == 2):      #Registo
@@ -89,18 +106,20 @@ def registo():
 
         #Guardar dados na base de dados
         try:
-            cur.execute(f"INSERT INTO utilizador(id, email, password, nome) VALUES (DEFAULT, '{email}', '{password_encriptada}', '{nickname}');")
+            cur.execute(f"INSERT INTO utilizador(id, email, password, nome) VALUES (DEFAULT, '{email}', '{password_encriptada}', '{nickname}') RETURNING id;")
+            id = cur.fetchone()[0]
+            cur.execute(f"INSERT INTO cliente(utilizador_id, saldo) VALUES ({id}, 15);")
             #Confirmar mudanças
             conn.commit()
             #De volta ao início
-            print("BEM VINDO AO NETFLOX")
+            print("BEM VIND@ À FAMÍLIA NETFLOX")
             return
         except:
             print("Dados não válidos")
 
 
 #==========================================================================================================================
-#Procedimento
+#Iniciar programa
 inicio()
 
 

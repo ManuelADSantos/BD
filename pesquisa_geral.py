@@ -29,8 +29,10 @@ while pesquisageral:
         Pesquisa por: """)
 
     if pesquisa == "V" or pesquisa == "v":
-@@ -44,255 +44,170 @@
-
+        pesquisageral = False
+        ordenar = False
+        
+    print("\n")
     # especificar critérios de ordenação dos resultados
     if ordenar == True:
 

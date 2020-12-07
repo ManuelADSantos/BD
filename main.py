@@ -170,33 +170,24 @@ def admin_estatisticas():
         print("\n")
 
         #---------------------------------------------Numero de clientes--------------------------------------------------
-
         if estatisticas == "1":
             cur.execute("SELECT count(*) from cliente;")
-
-            print("Número total de clientes: ")
             nclientes = cur.fetchone()
 
             if nclientes is None:
-                print("Resultado não encontrado!")
-
-            while nclientes is not None:
-                print("->", *nclientes)
-                nclientes = cur.fetchone()
+                print("Sem clientes registados")
+            elif nclientes is not None:
+                print("Número total de clientes: ", *nclientes)
 
         #---------------------------------------------Numero de artigos----------------------------------------------------
         elif estatisticas == "2":
             cur.execute("SELECT count(*) from artigo;")
+            nartigos = cur.fetchone()
 
-            print("Número total de Artigos: ")
-            nclientes = cur.fetchone()
-
-            if nclientes is None:
-                print("Resultado não encontrado!")
-
-            while nclientes is not None:
-                print("->", *nclientes)
-                nclientes = cur.fetchone()
+            if nartigos is None:
+                print("Sem artigos registados")
+            elif nartigos is not None:
+                print("Número total de Artigos: ", *nartigos)
 
         #------------------------------------------Numero de artigos por tipo-----------------------------------------------
         elif estatisticas == "3":

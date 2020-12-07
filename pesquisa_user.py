@@ -11,7 +11,7 @@ cur = conn.cursor()
 
 # -------------------------------------Pesquisa aos artigos neste momento alugados pelo cliente--------------------------
 
-cliente_atual = 1
+cliente_atual = 2
 pesquisauser = True
 ordenar = True
 
@@ -91,7 +91,7 @@ while pesquisauser:
 
         titulo3 = input("Pesquisa por Ator (ordem crescente): \n")
 
-        cur.execute(f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where artigo.titulo = (SELECT artigo.titulo from artigo join artigo_atores on artigo.id = artigo_atores.artigo_id join atores on atores.id= artigo_atores.atores_id where atores.nome like '%{titulo3}') and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}' ORDER BY titulo ASC;")
+        cur.execute(f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id join artigo_atores on artigo.id = artigo_atores.artigo_id join atores on atores.id= artigo_atores.atores_id where atores.nome like '%{titulo3}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}' ORDER BY titulo ASC;")
 
         print("Título (ordem crescente):")
         p_atores = cur.fetchone()
@@ -145,8 +145,11 @@ while pesquisauser:
         while True:
             try:
                 titulo6 = int(input("Pesquisa por Ano (ordem crescente): \n"))
+                # a primeira exibição de um filme de curta duração aconteceu no Salão Grand Café, em Paris, em 28 de dezembro de 1895
+                if titulo6 < 1895 or titulo6 >= 2021:
+                    raise ValueError("INSIRA UM ANO VÁLIDO!")
             except ValueError:
-                print("INSIRA UM ANO!")
+                print("INSIRA UM ANO VÁLIDO!")
                 continue
             else:
                 break
@@ -207,8 +210,7 @@ while pesquisauser:
 
         titulo3 = input("Pesquisa por Ator (ordem decrescente): \n")
 
-        cur.execute(
-            f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where artigo.titulo = (SELECT artigo.titulo from artigo join artigo_atores on artigo.id = artigo_atores.artigo_id join atores on atores.id= artigo_atores.atores_id where atores.nome like '%{titulo3}') and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}' ORDER BY titulo DESC;")
+        cur.execute(f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id join artigo_atores on artigo.id = artigo_atores.artigo_id join atores on atores.id= artigo_atores.atores_id where atores.nome like '%{titulo3}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}' ORDER BY titulo DESC;")
 
         print("Título (ordem decrescente):")
         p_atores = cur.fetchone()
@@ -264,8 +266,11 @@ while pesquisauser:
         while True:
             try:
                 titulo6 = int(input("Pesquisa por Ano (ordem decrescente): \n"))
+                #a primeira exibição de um filme de curta duração aconteceu no Salão Grand Café, em Paris, em 28 de dezembro de 1895
+                if titulo6 < 1895 or titulo6 >= 2021:
+                    raise ValueError("INSIRA UM ANO VÁLIDO!")
             except ValueError:
-                print("INSIRA UM ANO!")
+                print("INSIRA UM ANO VÁLIDO!")
                 continue
             else:
                 break

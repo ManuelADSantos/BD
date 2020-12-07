@@ -37,22 +37,38 @@ while pesquisageral:
     # especificar critérios de ordenação dos resultados
     if ordenar == True:
 
-        ordem = input(""" Ordenação dos resultados:
-                                  C - ordem crescente
-                                  D - ordem decrescente
-        ORDEM(C|D): """)
+        while True:
+            try:
 
+                ordem = int(input(""" Ordenação dos resultados:
+                                      1 - ordem crescente
+                                      2 - ordem decrescente)
+                ORDEM(1|2): """))
+
+                if ordem != 1 and ordem != 2:
+                    raise ValueError("ERRO")
+            except ValueError:
+                print("ERRO")
+                continue
+            else:
+                break
+                return(ordem)
+
+    if ordem == 1:
+        ordem = "ASC"
+    elif ordem == 2:
+        ordem = "DESC"
 
     print("\n")
 
     # .........................................ORDEM CRESCENTE.....................................................
 
     #--------------------------------------------PESQUISA POR TIPO-------------------------------------------------
-    if pesquisa == "1" and ordem == "C":
+    if pesquisa == "1":
 
         titulo1 = input("Pesquisa por tipo (ordem crescente): \n")
 
-        cur.execute(f"SELECT titulo from artigo where tipo like '%{titulo1}' ORDER by titulo ASC;")
+        cur.execute(f"SELECT titulo from artigo where tipo like '%{titulo1}' ORDER by titulo '%{ordem}';")
 
         print("Título (ordem crescente):")
 
@@ -143,8 +159,11 @@ while pesquisageral:
         while True:
             try:
                 titulo6 = int(input("Pesquisa por Ano (ordem crescente): \n"))
+                # a primeira exibição de um filme de curta duração aconteceu no Salão Grand Café, em Paris, em 28 de dezembro de 1895
+                if titulo6 < 1895 or titulo6 >= 2021:
+                    raise ValueError("INSIRA UM ANO VÁLIDO!")
             except ValueError:
-                print("INSIRA UM ANO!")
+                print("INSIRA UM ANO VÁLIDO!")
                 continue
             else:
                 break
@@ -279,8 +298,11 @@ while pesquisageral:
         while True:
             try:
                 titulo6 = int(input("Pesquisa por Ano (ordem decrescente): \n"))
+                # a primeira exibição de um filme de curta duração aconteceu no Salão Grand Café, em Paris, em 28 de dezembro de 1895
+                if titulo6 < 1895 or titulo6 >= 2021:
+                    raise ValueError("INSIRA UM ANO VÁLIDO!")
             except ValueError:
-                print("INSIRA UM ANO!")
+                print("INSIRA UM ANO VÁLIDO!")
                 continue
             else:
                 break

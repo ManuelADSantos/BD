@@ -26,7 +26,7 @@ def saldos_cliente():
                                 1 - Ver Saldo
                                 2 - Pedir Aumento
                                 V|v - Voltar
-    
+
             Resposta: """)
 
     #----------------------------------------- VER SALDO---------------------------------------------------------
@@ -85,7 +85,7 @@ def saldos_admin():
     # -----------------------------------------------MENU SALDO-----------------------------------------------------
     saldos = True
 
-    # PEDE AO CLIENTE QUE TIPO DE PESQUISA QUER EFETUAR
+    # PEDE AO ADMIN QUE TIPO DE PESQUISA QUER EFETUAR
     while saldos:
         print("----------------------MENU SALDO---------------------")
         print("\n O que pretende fazer? \n")

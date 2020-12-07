@@ -49,11 +49,11 @@ def cliente_mensagens():
             print("Tenta outra vez")
 
 
-# -----------------------------------------------MENU MENSAGENS CLIENTE-------------------------------------------------
+# -----------------------------------------------MENU MENSAGENS ADMIN-------------------------------------------------
 def admin_mensagens():
     mensagensa = True
 
-    # PEDE AO CLIENTE QUE TIPO DE PESQUISA QUER EFETUAR
+    # PEDE AO ADMIN QUE TIPO DE PESQUISA QUER EFETUAR
     while mensagensa:
         print("----------------------MENU MENSAGENS---------------------")
         print("\n Que mensagem pretende enviar? \n")

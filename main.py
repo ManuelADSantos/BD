@@ -67,16 +67,16 @@ def login():
     print("\n----------------------------Login--------------------------------")
     while True:
         email = input("\n\t\t\t || Email ||\n\t\t ")
-        cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}'")
+        cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
         email_verif = cur.fetchone()
         if (email_verif[0]==1):
             while True:
                 password = getpass("\n\t\t        || Password ||\n\t\t\t     ")
-                cur.execute(f"SELECT password FROM utilizador WHERE email LIKE '%{email}'")
+                cur.execute(f"SELECT password FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
                 password_verif = cur.fetchone()
                 if(sha256_crypt.verify(password ,password_verif[0])):
                     print("\nInicio de sessão bem sucedida\n")
-                    cur.execute(f"SELECT id FROM utilizador WHERE email LIKE '%{email}'")
+                    cur.execute(f"SELECT id FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
                     global utilizador_atual
                     utilizador_atual = cur.fetchone()[0]
                     break
@@ -96,7 +96,7 @@ def registo():
         print("\n----------------------------Registo--------------------------------")
         while True:
             email = input("\nInsira o seu endereço de email\n    ")
-            cur.execute(f"SELECT COUNT(email) from utilizador where email like '%{email}'")
+            cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
             email_verif = cur.fetchone()
             if ("@" in email and email_verif[0]==0 and ' ' not in email and email[0]!= '@' and email[len(email)-1]!='@' and '.' in email):
                 print(f"Email inserido\n    {email}")
@@ -130,6 +130,7 @@ def registo():
             print("BEM VIND@ À FAMÍLIA NETFLOX")
             return
         except:
+            conn.rollback()
             print("Dados não válidos")
 
 
@@ -253,7 +254,7 @@ def admin_adicionarartigo():
             if perguntar == "S" or perguntar == "s":
                 while True:
                     ator = input("\nInsira o nome do ator ou atriz a associar a este artigo(Primeiro e Último nome): ")
-                    cur.execute(f"SELECT id FROM atores WHERE nome LIKE '%{ator}'")
+                    cur.execute(f"SELECT id FROM atores WHERE nome LIKE '%{ator}' AND nome LIKE '{ator}%'")
                     id_ator = cur.fetchone()
                     if id_ator is not None:                         #Ator pertence à base de dados
                         cur.execute(f"INSERT INTO artigo_atores(artigo_id, atores_id) VALUES ({id_artigo},{id_ator[0]});")
@@ -266,31 +267,41 @@ def admin_adicionarartigo():
                     elif id_ator is None:                           #Ator não pertence à base de dados
                         print("Ator/atriz não registado/a na base de dados")
                         while True:                 #Adicionar novo ator
+                            novo = True
                             nome_novo_ator = input("Nome do novo ator a inserir na base de dados(Primeiro e Último nome): ")
-                            check = input("Confirma os dados do novo ator a adicionar à base de dados?(S/N):\n")
-                            if check == "S" or check == "s":
+                            cur.execute(f"SELECT id FROM atores WHERE nome LIKE '%{nome_novo_ator}' AND nome LIKE '{nome_novo_ator}%'")
+                            existe = cur.fetchall()
+                            if existe is None:
+                                check = input("Confirma os dados do novo ator a adicionar à base de dados?(S/N):\n")
+                            else:
+                                print("\nAtor/atriz já registado/a na base de dados")
+                                novo = False
+
+                            if (check == "S" or check == "s") and novo == True:
                                 cur.execute(f"INSERT INTO atores(id, nome) VALUES (DEFAULT,'{nome_novo_ator}') RETURNING id;")
                                 id_novo_ator = cur.fetchone()[0]
                                 cur.execute(f"INSERT INTO artigo_atores(artigo_id, atores_id) VALUES ({id_artigo},{id_novo_ator});")
+                                print(f"\n{nome_novo_ator} participa agora neste artigo")
                                 break
                             else:
                                 print("Nome não registado")
 
                         mais = input("Pretende adicionar mais atores ao artigo?(S/N):\n")
-                        if mais == "S" or mais == "s":
-                            print("")
-                        else:
+                        if mais == "N" or mais == "n":
                             break
+                        else:
+                            print("")
 
                 conn.commit()
                 return
 
             else:
-                conn.rollback()
+                conn.commit()
                 return
 
         except:
             print("\nDados Inválidos")
+            conn.rollback()
 
 
 

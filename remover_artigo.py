@@ -15,7 +15,7 @@ cur = conn.cursor()
 
 #==========================================================================================================================
 #Variáveis globais
-utilizador_atual = 0    #Utilizador com login efetuado
+utilizador_atual = 1    #Utilizador com login efetuado
 #==========================================================================================================================
 
 def admin_removerartigo():
@@ -24,7 +24,6 @@ def admin_removerartigo():
         cur.execute("SELECT (artigo.id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer) FROM artigo EXCEPT SELECT (artigo.id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer) FROM artigo INNER JOIN aluguer ON artigo.id = aluguer.artigo_id")
 
         #Apresentação de artigos possíveis de remoção
-        indice = 0
         disponiveis = cur.fetchone()
         while disponiveis is not None:
             disponiveis = cur.fetchone()
@@ -32,21 +31,29 @@ def admin_removerartigo():
                 break
             else:
                 print(f"-> {disponiveis[0]}")
-                indice += 1
 
         voltar = input("\nENTER - Avançar para a remoção\nV/v - Voltar ao MENU\n\n")
 
         if voltar == "":
             while True:
-                try:
-
-                        escolha = int(input("Escolha o artigo que deseja remover(ID): "))
+                    while True:
+                        try:
+                            escolha = int(input("Escolha o artigo que deseja remover(ID): "))
+                            cur.execute(f"SELECT titulo FROM artigo WHERE id = {escolha}")
+                            existe = cur.fetchone()
+                            if existe is not None:
+                                break
+                            elif existe is None:
+                                print("Não existe um artigo com o ID indicado")
+                        except ValueError:
+                            print("ID não válido")
 
 
                     validar = input("\nPretende avançar com a remoção? (S/N)\n")
                     if validar == "S" or validar == "s":
-                        cur.execute(f"DELETE FROM artigo WHERE id = {escolha}")
                         cur.execute(f"DELETE FROM historico_precos WHERE artigo_id = {escolha}")
+                        cur.execute(f"DELETE FROM artigo_atores WHERE artigo_id = {escolha}")
+                        cur.execute(f"DELETE FROM artigo WHERE id = {escolha}")
 
                         tentativas = 3
                         while tentativas > 0:
@@ -71,8 +78,6 @@ def admin_removerartigo():
                     else:
                         print("\nOpção inválida")
 
-                except:
-                    print("Valor de ID inválido")
 
         elif voltar == "V" or voltar == "v":
             break

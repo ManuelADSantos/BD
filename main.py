@@ -254,18 +254,29 @@ def admin_adicionarartigo():
                 while True:
                     ator = input("\nInsira o nome do ator ou atriz a associar a este artigo(Primeiro e Último nome): ")
                     cur.execute(f"SELECT id FROM atores WHERE nome LIKE '%{ator}'")
-                    id_ator = cur.fetchone()[0]
-                    if id_ator is not None:         #Ator pertence à base de dados
-                        cur.execute(f"INSERT INTO artigo_atores(artigo_id, atores_id) VALUES ({id_artigo},{id_ator});")
-                        print(f"\n{ator} participa neste artigo")
-                        mais = input("Pretende adicionar mais atores?(S/N):\n")
+                    id_ator = cur.fetchone()
+                    if id_ator is not None:                         #Ator pertence à base de dados
+                        cur.execute(f"INSERT INTO artigo_atores(artigo_id, atores_id) VALUES ({id_artigo},{id_ator[0]});")
+                        print(f"\n{ator} participa agora neste artigo")
+                        mais = input("Pretende adicionar mais atores ao artigo?(S/N):\n")
                         if mais == "S" or mais == "s":
                             print("")
                         else:
                             break
-                    else:                           #Ator não pertence à base de dados
+                    elif id_ator is None:                           #Ator não pertence à base de dados
                         print("Ator/atriz não registado/a na base de dados")
-                        mais = input("Pretende adicionar mais atores?(S/N):\n")
+                        while True:                 #Adicionar novo ator
+                            nome_novo_ator = input("Nome do novo ator a inserir na base de dados(Primeiro e Último nome): ")
+                            check = input("Confirma os dados do novo ator a adicionar à base de dados?(S/N):\n")
+                            if check == "S" or check == "s":
+                                cur.execute(f"INSERT INTO atores(id, nome) VALUES (DEFAULT,'{nome_novo_ator}') RETURNING id;")
+                                id_novo_ator = cur.fetchone()[0]
+                                cur.execute(f"INSERT INTO artigo_atores(artigo_id, atores_id) VALUES ({id_artigo},{id_novo_ator});")
+                                break
+                            else:
+                                print("Nome não registado")
+
+                        mais = input("Pretende adicionar mais atores ao artigo?(S/N):\n")
                         if mais == "S" or mais == "s":
                             print("")
                         else:
@@ -275,8 +286,9 @@ def admin_adicionarartigo():
                 return
 
             else:
-                conn.commit()
+                conn.rollback()
                 return
+
         except:
             print("\nDados Inválidos")
 

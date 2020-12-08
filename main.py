@@ -3,6 +3,7 @@ import psycopg2.extras
 from passlib.hash import sha256_crypt
 from getpass import getpass
 import os
+import datetime
 
 
 #==========================================================================================================================
@@ -226,25 +227,40 @@ def admin_adicionarartigo():
 
         #Ano
         while True:
-            novo_ano = int(input("Ano do novo artigo: "))
-            validar = input("\nConfirma o ano do artigo a introduzir? (S/N)\n")
-            if validar == "S" or validar == "s":
-                break
-            if validar == "N" or validar == "n":
-                print("\nAno descartado")
-            else:
-                print("\nOpção inválida")
+            ano_atual = datetime.datetime.now()
+            ano_atual = int(ano_atual.strftime("%Y"))
+            try:
+                novo_ano = int(input("Ano do novo artigo: "))
+
+                if novo_ano < 1880 or novo_ano > ano_atual:
+                    print("Valor não válido")
+                else:
+                    validar = input("\nConfirma o ano do artigo a introduzir? (S/N)\n")
+                    if validar == "S" or validar == "s":
+                        break
+                    if validar == "N" or validar == "n":
+                        print("\nAno descartado")
+                    else:
+                        print("\nOpção inválida")
+            except ValueError:
+                print("Valor não válido")
 
         #Periodo de aluguer
         while True:
-            novo_periodoaluguer = int(input("Especifique o periodo de aluguer do novo artigo (em meses): "))
-            validar = input("\nConfirma o periodo de aluguer do artigo a introduzir? (S/N)\n")
-            if validar == "S" or validar == "s":
-                break
-            if validar == "N" or validar == "n":
-                print("\nPeriodo de aluguer descartado")
-            else:
-                print("\nOpção inválida")
+            try:
+                novo_periodoaluguer = int(input("Especifique o periodo de aluguer do novo artigo (em meses): "))
+                if novo_periodoaluguer > 0:
+                    validar = input("\nConfirma o periodo de aluguer do artigo a introduzir? (S/N)\n")
+                    if validar == "S" or validar == "s":
+                        break
+                    if validar == "N" or validar == "n":
+                        print("\nPeriodo de aluguer descartado")
+                    else:
+                        print("\nOpção inválida")
+                else:
+                    print("Valor inválido")
+            except:
+                print("\nValor inválido")
 
         #Efetuar Registo
         try:
@@ -263,42 +279,67 @@ def admin_adicionarartigo():
                         if mais == "S" or mais == "s":
                             print("")
                         else:
+                            print("\nArtigo adicionado com sucesso")
                             break
                     elif id_ator is None:                           #Ator não pertence à base de dados
-                        print("Ator/atriz não registado/a na base de dados")
-                        while True:                 #Adicionar novo ator
-                            novo = True
-                            nome_novo_ator = input("Nome do novo ator a inserir na base de dados(Primeiro e Último nome): ")
-                            cur.execute(f"SELECT id FROM atores WHERE nome LIKE '%{nome_novo_ator}' AND nome LIKE '{nome_novo_ator}%'")
-                            existe = cur.fetchall()
-                            if existe is None:
-                                check = input("Confirma os dados do novo ator a adicionar à base de dados?(S/N):\n")
-                            else:
-                                print("\nAtor/atriz já registado/a na base de dados")
-                                novo = False
+                        while True:
+                            saber = input("Ator/atriz não registado/a na base de dados. Pretende adicionar o ator à nossa base de dados?(S/N)")
+                            if saber == "S" or saber == "s":
+                                while True:                 #Adicionar novo ator
+                                    novo = True
+                                    nome_novo_ator = input("Nome do novo ator a inserir na base de dados(Primeiro e Último nome): ")
+                                    cur.execute(f"SELECT id FROM atores WHERE nome LIKE '%{nome_novo_ator}' AND nome LIKE '{nome_novo_ator}%'")
+                                    existe = cur.fetchall()
+                                    print(existe)
+                                    if len(existe) == 0 :
+                                        check = input("Confirma os dados do novo ator a adicionar à base de dados?(S/N):\n")
+                                    else:
+                                        print("\nAtor/atriz já registado/a na base de dados")
+                                        novo = False
 
-                            if (check == "S" or check == "s") and novo == True:
-                                cur.execute(f"INSERT INTO atores(id, nome) VALUES (DEFAULT,'{nome_novo_ator}') RETURNING id;")
-                                id_novo_ator = cur.fetchone()[0]
-                                cur.execute(f"INSERT INTO artigo_atores(artigo_id, atores_id) VALUES ({id_artigo},{id_novo_ator});")
-                                print(f"\n{nome_novo_ator} participa agora neste artigo")
+                                    if (check == "S" or check == "s") and novo == True:
+                                        cur.execute(f"INSERT INTO atores(id, nome) VALUES (DEFAULT,'{nome_novo_ator}') RETURNING id;")
+                                        id_novo_ator = cur.fetchone()[0]
+                                        cur.execute(f"INSERT INTO artigo_atores(artigo_id, atores_id) VALUES ({id_artigo},{id_novo_ator});")
+                                        print(f"\n{nome_novo_ator} participa agora neste artigo")
+                                        break
+                                    else:
+                                        print("Nome não registado")
+                                break
+
+                            elif saber == "N" or saber == "n":
+                                break
+
+                            else:
+                                print("")
+
+                        while True:
+                            mais = input("Pretende adicionar mais atores ao artigo?(S/N):\n")
+                            if mais == "N" or mais == "n":
+                                print("\nArtigo adicionado com sucesso")
+                                out = True
+                                break
+                            elif mais == "S" or mais == "s":
+                                print("")
+                                out = False
                                 break
                             else:
-                                print("Nome não registado")
+                                print("Valor inválido")
 
-                        mais = input("Pretende adicionar mais atores ao artigo?(S/N):\n")
-                        if mais == "N" or mais == "n":
+
+                        if out == True:
                             break
-                        else:
-                            print("")
 
+
+                conn.commit()
+                return
+
+            elif perguntar == "N" or perguntar == "n":
                 conn.commit()
                 return
 
             else:
-                conn.commit()
-                return
-
+                print("Valor inválido")
         except:
             print("\nDados Inválidos")
             conn.rollback()

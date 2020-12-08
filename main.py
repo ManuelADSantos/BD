@@ -331,18 +331,48 @@ def admin_adicionarartigo():
                             break
 
 
-                conn.commit()
-                return
+                                tentativas = 3
+                                while tentativas > 0:
+                                    confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                                    cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                                    chave = cur.fetchone()[0]
+                                    if confirmar == chave:
+                                        print("\nArtigo adicionado com sucesso")
+                                        conn.commit()
+                                        return
+                                    else:
+                                        tentativas -= 1
+                                        print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                                        if tentativas == 0:
+                                            print("\nAdição de artigo cancelada!")
+                                            conn.rollback()
+                                            return
 
-            elif perguntar == "N" or perguntar == "n":
-                conn.commit()
-                return
 
-            else:
-                print("Valor inválido")
-        except:
-            print("\nDados Inválidos")
-            conn.rollback()
+                            elif perguntar == "N" or perguntar == "n":
+                                tentativas = 3
+                                while tentativas > 0:
+                                    confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                                    cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                                    chave = cur.fetchone()[0]
+                                    if confirmar == chave:
+                                        print("\nArtigo adicionado com sucesso")
+                                        conn.commit()
+                                        return
+                                    else:
+                                        tentativas -= 1
+                                        print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                                        if tentativas == 0:
+                                            print("\nAdição de artigo cancelada!")
+                                            conn.rollback()
+                                            return
+
+                            else:
+                                print("Valor inválido")
+                        except:
+                            print("\nDados Inválidos")
+                            conn.rollback()
+
 
 
 

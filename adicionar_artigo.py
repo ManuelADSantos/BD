@@ -13,6 +13,8 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Criar cursor
 cur = conn.cursor()
 
+
+utilizador_atual = 1;
 #==========================================================================================================================
 def admin_adicionarartigo():
     while True:
@@ -125,7 +127,6 @@ def admin_adicionarartigo():
                         if mais == "S" or mais == "s":
                             print("")
                         else:
-                            print("\nArtigo adicionado com sucesso")
                             break
                     elif id_ator is None:                           #Ator não pertence à base de dados
                         while True:
@@ -162,7 +163,6 @@ def admin_adicionarartigo():
                         while True:
                             mais = input("Pretende adicionar mais atores ao artigo?(S/N):\n")
                             if mais == "N" or mais == "n":
-                                print("\nArtigo adicionado com sucesso")
                                 out = True
                                 break
                             elif mais == "S" or mais == "s":
@@ -177,12 +177,41 @@ def admin_adicionarartigo():
                             break
 
 
-                conn.commit()
-                return
+                tentativas = 3
+                while tentativas > 0:
+                    confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                    cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                    chave = cur.fetchone()[0]
+                    if confirmar == chave:
+                        print("\nArtigo adicionado com sucesso")
+                        conn.commit()
+                        return
+                    else:
+                        tentativas -= 1
+                        print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                        if tentativas == 0:
+                            print("\nAdição de artigo cancelada!")
+                            conn.rollback()
+                            return
+
 
             elif perguntar == "N" or perguntar == "n":
-                conn.commit()
-                return
+                tentativas = 3
+                while tentativas > 0:
+                    confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                    cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                    chave = cur.fetchone()[0]
+                    if confirmar == chave:
+                        print("\nArtigo adicionado com sucesso")
+                        conn.commit()
+                        return
+                    else:
+                        tentativas -= 1
+                        print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                        if tentativas == 0:
+                            print("\nAdição de artigo cancelada!")
+                            conn.rollback()
+                            return
 
             else:
                 print("Valor inválido")

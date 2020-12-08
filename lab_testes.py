@@ -20,9 +20,9 @@ utilizador_atual = 1    #Utilizador com login efetuado
 #chave = cur.fetchone()[0]
 #print(chave)
 
-cur.execute(f"SELECT titulo FROM artigo WHERE id = 307")
-ver = cur.fetchone()[0]
-print(ver)
+# cur.execute(f"SELECT titulo FROM artigo WHERE id = 307")
+# ver = cur.fetchone()[0]
+# print(ver)
 
 
 

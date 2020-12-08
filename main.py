@@ -148,6 +148,7 @@ def menu_admin():
         escolha_admin = input("""
                               1 - Estatísticas
                               2 - Adicionar Artigo
+                              3 - Remover Artigo
                               V|v- Logout
 
         Ver: """)
@@ -157,6 +158,9 @@ def menu_admin():
 
         elif escolha_admin == "2":
             admin_adicionarartigo()
+
+        elif escolha_admin == "3":
+            admin_removerartigo()
 
         elif escolha_admin == "V" or escolha_admin== "v":
             print("LOGOUT")
@@ -331,50 +335,54 @@ def admin_adicionarartigo():
                             break
 
 
-                                tentativas = 3
-                                while tentativas > 0:
-                                    confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
-                                    cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
-                                    chave = cur.fetchone()[0]
-                                    if confirmar == chave:
-                                        print("\nArtigo adicionado com sucesso")
-                                        conn.commit()
-                                        return
-                                    else:
-                                        tentativas -= 1
-                                        print(f"\nChave errada. Tem {tentativas} tentativas restantes")
-                                        if tentativas == 0:
-                                            print("\nAdição de artigo cancelada!")
-                                            conn.rollback()
-                                            return
-
-
-                            elif perguntar == "N" or perguntar == "n":
-                                tentativas = 3
-                                while tentativas > 0:
-                                    confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
-                                    cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
-                                    chave = cur.fetchone()[0]
-                                    if confirmar == chave:
-                                        print("\nArtigo adicionado com sucesso")
-                                        conn.commit()
-                                        return
-                                    else:
-                                        tentativas -= 1
-                                        print(f"\nChave errada. Tem {tentativas} tentativas restantes")
-                                        if tentativas == 0:
-                                            print("\nAdição de artigo cancelada!")
-                                            conn.rollback()
-                                            return
-
+                        tentativas = 3
+                        while tentativas > 0:
+                            confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                            cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                            chave = cur.fetchone()[0]
+                            if confirmar == chave:
+                                print("\nArtigo adicionado com sucesso")
+                                conn.commit()
+                                return
                             else:
-                                print("Valor inválido")
-                        except:
-                            print("\nDados Inválidos")
-                            conn.rollback()
+                                tentativas -= 1
+                                print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                                if tentativas == 0:
+                                    print("\nAdição de artigo cancelada!")
+                                    conn.rollback()
+                                    return
 
 
+                    elif perguntar == "N" or perguntar == "n":
+                        tentativas = 3
+                        while tentativas > 0:
+                            confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                            cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                            chave = cur.fetchone()[0]
+                            if confirmar == chave:
+                                print("\nArtigo adicionado com sucesso")
+                                conn.commit()
+                                return
+                            else:
+                                tentativas -= 1
+                                print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                                if tentativas == 0:
+                                    print("\nAdição de artigo cancelada!")
+                                    conn.rollback()
+                                    return
 
+                        else:
+                            print("Valor inválido")
+        except:
+            print("\nDados Inválidos")
+            conn.rollback()
+
+
+#==========================================================================================================================
+#Menu ADMIN - Adicionar Artigos
+def admin_removerartigo():
+    print("REMOVER ARTIGO")
+    return
 
 #==========================================================================================================================
 #Menu ADMIN - Estatísticas

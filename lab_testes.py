@@ -16,10 +16,8 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 utilizador_atual = 1    #Utilizador com login efetuado
 #==========================================================================================================================
 
-mensagensa = True
-
 # PEDE AO ADMIN QUE TIPO DE PESQUISA QUER EFETUAR
-while mensagensa:
+while True:
     print("----------------------MENU MENSAGENS---------------------")
     print("\n Que mensagem pretende enviar? \n")
 
@@ -67,44 +65,72 @@ while mensagensa:
 
             elif voltar == "v" or voltar == "V":
                 print("A VOLTAR AO MENU")
+                mensagensa = False
                 break
             else:
                 print("")
 
     # -----------------------------------Mensagem individual-----------------------------------
     elif msg == "2":
+        while True:
+            print("----------------------MENU MENSAGEM INDIDUAL---------------------")
+            voltar = input("\nENTER - Enviar Mensagem\nV/v - Voltar ao MENU\n\n")
+            if voltar == "":
+                while True:
+                    print("Clientes aos quais é possível enviar mensagem\n")
+                    cur.execute("SELECT utilizador_id, nome FROM cliente, utilizador WHERE utilizador_id = id")
+                    for linha in cur.fetchall():
+                        x1 = linha['utilizador_id']
+                        x2 = linha['nome']
+                        print("-> ID:", x1,"/Nome: ", x2)
 
-        print("ENVIAR MENSAGEM INDIVIDUAL: ")
+                    try:
+                        cliente_msg = int(input("Qual o ID do cliente ao qual pretende enviar mensagem?\n"))
+                        cur.execute(f"SELECT utilizador_id FROM cliente WHERE utilizador_id = {cliente_msg}")
+                        existe = cur.fetchone()
+                        if existe is not None:
+                            break
+                        elif existe is None:
+                            print("Não existe um cliente com o ID indicado")
+                    except ValueError:
+                        print("ID não válido\n")
 
-        mcliente = input("A que cliente pretende enviar uma mensagem?: ")
 
-        cur.execute(f"SELECT nome from utilizador where nome like '%{mcliente}';")
+                while True:
+                    texto = input("ESCREVA A MENSAGEM: \n")
+                    verif_geral = input("Confirma que é esta a mensagem a enviar?(S/N)")
+                    if verif_geral == "S" or verif_geral == "s":
+                        try:
+                            print("Mensagem Confirmada")
+                            #Inserir mensagem na tabela mensagens
+                            cur.execute(f"INSERT INTO mensagem(id, corpo) VALUES (DEFAULT, '{texto}') RETURNING id;")
+                            id_mensagem = cur.fetchone()[0]
+                            #Registar mensagem na tabela mensagem_administrador
+                            cur.execute(f"INSERT INTO mensagem_administrador(mensagem_id, administrador_utilizador_id) VALUES ({id_mensagem}, {utilizador_atual});")
+                            #Registar mensagem na tabela cliente_mensagem
+                            cur.execute(f"INSERT INTO cliente_mensagem(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {cliente_msg});")
 
-        print("Cliente:")
+                            conn.commit()
+                            print("MENSAGEM INDIDUAL ENVIADA ")
+                            break
+                        except:
+                            conn.rollback()
+                            print("ERRO: MENSAGEM INDIDUAL ANULADA ")
+                    elif verif_geral == "N" or verif_geral == "n":
+                        print("Mensagem Eliminada")
+                        break
+                    else:
+                        print("Opção inválida")
+                        break
 
-        c = cur.fetchone()
-
-        if c is None:
-            print("Cliente não encontrado!")
-
-        while c is not None:
-            print("->", *c)
-            c = cur.fetchone()
-
-        texto = input("ESCREVA A MENSAGEM: \n")
-
-        cur.execute(f"INSERT INTO mensagem(id, corpo) VALUES (DEFAULT, '{texto}');")
-
-        cur.execute(f"INSERT INTO mensagem_administrador VALUES ();")
-
-    # Volta ao menu anterior
-    elif msg == "V" or msg == "v":
-        mensagensa = False
-
-    else:
-        print("Inválido")
-        print("Tenta outra vez")
-
+            elif voltar == "v" or voltar == "V":
+                print("A VOLTAR AO MENU")
+                mensagensa = False
+                break
+            else:
+                print("")
+    if msg == "v" or msg == "V":
+        break
 
 #==========================================================================================================================
 # Fecha a ligação à base de dados

@@ -103,7 +103,7 @@ def pesquisa_geral():
                 print("Resultado não encontrado!")
 
             while p_tipo is not None:
-                print("->", *p_tipo)
+                print("-> ", *p_tipo)
                 p_tipo = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR TITULO-------------------------------------------------

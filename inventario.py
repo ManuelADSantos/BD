@@ -17,14 +17,18 @@ def alugueres():
 
     print("-------------------------------------------ALUGUERES------------------------------------------")
 
-    cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, aluguer.ativo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}'and aluguer.ativo = True ORDER by aluguer.data DESC;")
+    cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, aluguer.ativo \
+    from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id \
+    where cliente.utilizador_id = '{utilizador_atual}'and aluguer.ativo = True ORDER by aluguer.data DESC;")
 
     print("......................Ativos.......................")
     for linha in cur.fetchall():
         titulo, periodo_de_aluguer,data, ativo = linha
         print("Título: ", titulo, " | Data: ", data, "| Periodo de Aluguer: ", periodo_de_aluguer, " | Ativo?:", ativo)
 
-    cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, aluguer.ativo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}' and aluguer.ativo = False ORDER by aluguer.data DESC;")
+    cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, aluguer.ativo from artigo \
+    join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id \
+    where cliente.utilizador_id = '{utilizador_atual}' and aluguer.ativo = False ORDER by aluguer.data DESC;")
 
     print(".....................Não Ativos......................")
     for linha in cur.fetchall():
@@ -36,7 +40,8 @@ def historico ():
 
     print("\n--------------------------------Histórico de preços----------------------------------------------\n")
 
-    cur.execute(f"SELECT h.preco, h.entrada_em_vigor, h.atual from historico_precos as h join artigo as a on h.artigo_id = a.id where titulo = '{artdet}' ORDER BY h.entrada_em_vigor DESC;")
+    cur.execute(f"SELECT h.preco, h.entrada_em_vigor, h.atual from historico_precos as h join artigo as a on h.artigo_id = a.id \
+    where titulo = '{artdet}' ORDER BY h.entrada_em_vigor DESC;")
 
     for linha in cur.fetchall():
         preco, entrada_em_vigor, atual = linha
@@ -74,6 +79,7 @@ def historico ():
         else:
             print("S|N")
 
+#======================================== MENU INVENTARIO: ===========================================================
 def inventario():
     print("----------------------------------------INVENTÁRIO DE ARTIGOS-----------------------------------------------")
 
@@ -101,7 +107,8 @@ def inventario():
 
                 artdet = input("Qual artigo quer ver detalhes?: ")
 
-                cur.execute(f"SELECT a.titulo, a.tipo, a.realizador, a.produtor, a.ano, at.nome from artigo as a join artigo_atores as aa on a.id = aa.artigo_id join atores as at on aa.atores_id = at.id where a.titulo = '{artdet}';")
+                cur.execute(f"SELECT a.titulo, a.tipo, a.realizador, a.produtor, a.ano, at.nome \
+                from artigo as a join artigo_atores as aa on a.id = aa.artigo_id join atores as at on aa.atores_id = at.id where a.titulo = '{artdet}';")
 
                 detalhes = cur.fetchone()
 
@@ -131,7 +138,8 @@ def inventario():
 
                             print("\n----------------------------Condições de aluguer--------------------------------------\n")
 
-                            cur.execute(f"SELECT a.periodo_de_aluguer, h.preco from artigo as a join historico_precos as h on a.id = h.artigo_id where a.titulo = '{artdet}' and h.atual = True;")
+                            cur.execute(f"SELECT a.periodo_de_aluguer, h.preco from artigo as a\
+                             join historico_precos as h on a.id = h.artigo_id where a.titulo = '{artdet}' and h.atual = True;")
 
                             for linha in cur.fetchall():
                                 periodo_de_aluguer, preco = linha
@@ -180,7 +188,8 @@ def lista():
 
             artdet = input("Qual artigo quer ver detalhes?: ")
 
-            cur.execute(f"SELECT a.titulo, a.tipo, a.realizador, a.produtor, a.ano, at.nome from artigo as a join artigo_atores as aa on a.id = aa.artigo_id join atores as at on aa.atores_id = at.id where a.titulo = '{artdet}';")
+            cur.execute(f"SELECT a.titulo, a.tipo, a.realizador, a.produtor, a.ano, at.nome from artigo as a join artigo_atores\
+            as aa on a.id = aa.artigo_id join atores as at on aa.atores_id = at.id where a.titulo = '{artdet}';")
 
             detalhes = cur.fetchone()
 
@@ -211,7 +220,8 @@ def lista():
 
                 if det1 == "S" or det1 == "s":
 
-                    cur.execute(f"INSERT INTO aluguer (id, data, ativo, artigo_id, cliente_utilizador_id) VALUES (DEFAULT, CURRENT_TIMESTAMP, True, (SELECT id from artigo where titulo = '{artdet}'), '{utilizador_atual}');")
+                    cur.execute(f"INSERT INTO aluguer (id, data, ativo, artigo_id, cliente_utilizador_id) \
+                    VALUES (DEFAULT, CURRENT_TIMESTAMP, True, (SELECT id from artigo where titulo = '{artdet}'), '{utilizador_atual}');")
 
                     print("\nALUGADO!\n")
 

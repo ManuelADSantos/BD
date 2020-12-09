@@ -9,6 +9,16 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Cria um objecto (cursor) que permite executar operações sobre a base de dados
 cur = conn.cursor()
 
+def imprimir():
+    n = cur.fetchone()
+
+    if n is None:
+        print("Resultado não encontrado!")
+
+    elif n is not None:
+        print("->", *n)
+
+
 estatistica = True
 
 while estatistica:
@@ -34,28 +44,16 @@ while estatistica:
         cur.execute("SELECT count(*) from cliente;")
 
         print("Número total de clientes: ")
-        nclientes = cur.fetchone()
 
-        if nclientes is None:
-            print("Resultado não encontrado!")
-
-        while nclientes is not None:
-            print("->", *nclientes)
-            nclientes = cur.fetchone()
+        imprimir()
 
     #---------------------------------------------Numero de artigos----------------------------------------------------
     elif estatisticas == "2":
         cur.execute("SELECT count(*) from artigo;")
 
         print("Número total de Artigos: ")
-        nclientes = cur.fetchone()
 
-        if nclientes is None:
-            print("Resultado não encontrado!")
-
-        while nclientes is not None:
-            print("->", *nclientes)
-            nclientes = cur.fetchone()
+        imprimir()
 
     #------------------------------------------Numero de artigos por tipo-----------------------------------------------
     elif estatisticas == "3":
@@ -64,54 +62,27 @@ while estatistica:
 
         print("Número de Filmes:" )
 
-        nartigos_filme = cur.fetchone()
-
-        if nartigos_filme is None:
-            print("Resultado não encontrado!")
-
-        while nartigos_filme is not None:
-            print("->", *nartigos_filme)
-            nartigos_filme = cur.fetchone()
+        imprimir()
 
         cur.execute("SELECT count(tipo) from artigo where tipo like 'serie';")
 
         print("Número de Séries:")
 
-        nartigos_serie = cur.fetchone()
-
-        if nartigos_serie is None:
-            print("Resultado não encontrado!")
-
-        while nartigos_serie is not None:
-            print("->", *nartigos_serie)
-            nartigos_serie = cur.fetchone()
+        imprimir()
 
         cur.execute("SELECT count(tipo) from artigo where tipo like 'documentario';")
 
         print("Número de Documentários:")
 
-        nartigos_doc = cur.fetchone()
-
-        if nartigos_doc is None:
-            print("Resultado não encontrado!")
-
-        while nartigos_doc is not None:
-            print("->", *nartigos_doc)
-            nartigos_doc = cur.fetchone()
+        imprimir()
 
     #-----------------------------------Valor total dos artigos alugados no momento atual-------------------------------
     elif estatisticas == "4":
         cur.execute("SELECT sum(historico_precos.preco) from historico_precos join artigo on historico_precos.artigo_id = artigo.id join aluguer on artigo.id = aluguer.artigo_id where historico_precos.atual = True AND aluguer.ativo = True;")
 
         print("Valor total dos Artigos alugados atualmente:")
-        valortotal = cur.fetchone()
 
-        if valortotal is None:
-            print("Resultado não encontrado!")
-
-        while valortotal is not None:
-            print("->", *valortotal)
-            valortotal = cur.fetchone()
+        imprimir()
 
     #--------------------------------------Valor total dos alugueres desde sempre---------------------------------------
     elif estatisticas == "5":
@@ -119,14 +90,8 @@ while estatistica:
         cur.execute("SELECT sum(preco) from historico_precos;")
 
         print("Valor total dos Alugueres desde sempre:")
-        alugueres = cur.fetchone()
 
-        if alugueres is None:
-            print("Resultado não encontrado!")
-
-        while alugueres is not None:
-            print("->", *alugueres)
-            alugueres = cur.fetchone()
+        imprimir()
 
     #------------------------------------------Cliente com mais alugueres-----------------------------------------------
     elif estatisticas == "6":
@@ -134,32 +99,20 @@ while estatistica:
         cur.execute("SELECT utilizador.nome, '| nº de alugueres:' ,count(*) as total from utilizador join cliente on utilizador.id = cliente.utilizador_id join aluguer on cliente.utilizador_id = aluguer.cliente_utilizador_id where aluguer.ativo = True GROUP by utilizador.nome order by total DESC LIMIT 10;")
 
         print("TOP 10 -> Cliente com mais alugueres: ")
-        clientemvp = cur.fetchone()
 
-        if clientemvp is None:
-            print("Resultado não encontrado!")
-
-        while clientemvp is not None:
-            print("->", *clientemvp)
-            clientemvp = cur.fetchone()
+        imprimir()
 
     #-------------------------------------------------Artigo mais alugado----------------------------------------------
     elif estatisticas == "7":
         cur.execute("SELECT artigo.titulo, '|nº vezes alugado: ', count(*) as total from artigo join aluguer on artigo.id = aluguer.artigo_id where aluguer.ativo = True GROUP by artigo.titulo order by total DESC LIMIT 10;")
 
         print("TOP 10 - Artigo mais alugado atualmente:")
-        artigoalugado = cur.fetchone()
 
-        if artigoalugado is None:
-            print("Resultado não encontrado!")
-
-        while artigoalugado is not None:
-            print("->", *artigoalugado)
-            artigoalugado = cur.fetchone()
+        imprimir()
 
     #----------------------------------------------------SAIR-----------------------------------------------------------
     elif estatisticas == "V" or estatisticas== "v":
-        print("VOLTAR AO MENU ****")
+        print("VOLTAR AO MENU ADMINISTRADOR")
         estatistica = False
 
     else:

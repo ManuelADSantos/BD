@@ -30,7 +30,7 @@ def admin_removerartigo():
             if disponiveis is None:
                 break
             else:
-                print(f"-> {disponiveis[0]}")
+                print("->",*disponiveis)
 
         voltar = input("\nENTER - Avançar para a remoção\nV/v - Voltar ao MENU\n\n")
 

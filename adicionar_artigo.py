@@ -80,7 +80,7 @@ def admin_adicionarartigo():
             try:
                 novo_ano = int(input("Ano do novo artigo: "))
 
-                if novo_ano < 1880 or novo_ano > ano_atual:
+                if novo_ano < 1895 or novo_ano > ano_atual:
                     print("Valor não válido")
                 else:
                     validar = input("\nConfirma o ano do artigo a introduzir? (S/N)\n")
@@ -111,11 +111,27 @@ def admin_adicionarartigo():
                 print("\nValor inválido")
 
         #Adicionar preço
+        while True:
+            try:
+                novo_preco = float(input("Especifique o preço do novo artigo: "))
+                if novo_preco >= 0:
+                    validar = input("\nConfirma o preço do artigo a introduzir? (S/N)\n")
+                    if validar == "S" or validar == "s":
+                        break
+                    if validar == "N" or validar == "n":
+                        print("\nPreço descartado")
+                    else:
+                        print("\nOpção inválida")
+                else:
+                    print("Valor inválido")
+            except:
+                print("\nValor inválido")
 
         #Efetuar Registo
         try:
             cur.execute(f"INSERT INTO artigo(id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer) VALUES (DEFAULT, '{novo_titulo}', '{novo_tipo}', '{novo_realizador}', '{novo_produtor}', {novo_ano}, {novo_periodoaluguer}) RETURNING id;")
             id_artigo = cur.fetchone()[0]
+            cur.execute(f"INSERT INTO historico_precos(id,preco,entrada_em_vigor,atual,artigo_id) VALUES (DEFAULT, {novo_preco}, CURRENT_TIMESTAMP, True , {id_artigo});")
             perguntar = input("Pretende associar atores a este artigo? (S/N)\n")
             if perguntar == "S" or perguntar == "s":
                 while True:

@@ -50,9 +50,28 @@ while True:
                             for linha in cur.fetchall():
                                 cur.execute(f"INSERT INTO cliente_mensagem(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {linha['utilizador_id']});")
 
-                            conn.commit()
-                            print("MENSAGEM GERAL ENVIADA ")
-                            break
+                            tentativas = 3
+                            sair = False
+                            while tentativas > 0:
+                                confirmar = getpass("Introduza a sua chave de administrador para confirmar o envio da mensagem:\n")
+                                cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                                chave = cur.fetchone()[0]
+                                if confirmar == chave:
+                                    print("MENSAGEM GERAL ENVIADA ")
+                                    conn.commit()
+                                    sair = True
+                                    break
+                                else:
+                                    tentativas -= 1
+                                    print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                                    if tentativas == 0:
+                                        print("\nEnvio da mensagem cancelado!")
+                                        conn.rollback()
+                                        sair = True
+                                        break
+                            if (sair == True):
+                                break
+
                         except:
                             conn.rollback()
                             print("ERRO: MENSAGEM GERAL ANULADA ")
@@ -110,9 +129,28 @@ while True:
                             #Registar mensagem na tabela cliente_mensagem
                             cur.execute(f"INSERT INTO cliente_mensagem(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {cliente_msg});")
 
-                            conn.commit()
-                            print("MENSAGEM INDIDUAL ENVIADA ")
-                            break
+                            tentativas = 3
+                            sair = False
+                            while tentativas > 0:
+                                confirmar = getpass("Introduza a sua chave de administrador para confirmar o envio da mensagem:\n")
+                                cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                                chave = cur.fetchone()[0]
+                                if confirmar == chave:
+                                    print("MENSAGEM INDIDUAL ENVIADA ")
+                                    conn.commit()
+                                    sair = True
+                                    break
+                                else:
+                                    tentativas -= 1
+                                    print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                                    if tentativas == 0:
+                                        print("\nEnvio da mensagem cancelado!")
+                                        conn.rollback()
+                                        sair = True
+                                        break
+                            if (sair == True):
+                                break
+
                         except:
                             conn.rollback()
                             print("ERRO: MENSAGEM INDIDUAL ANULADA ")

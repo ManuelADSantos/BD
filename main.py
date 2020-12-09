@@ -294,7 +294,6 @@ def admin_adicionarartigo():
                                     nome_novo_ator = input("Nome do novo ator a inserir na base de dados(Primeiro e Último nome): ")
                                     cur.execute(f"SELECT id FROM atores WHERE nome LIKE '%{nome_novo_ator}' AND nome LIKE '{nome_novo_ator}%'")
                                     existe = cur.fetchall()
-                                    print(existe)
                                     if len(existe) == 0 :
                                         check = input("Confirma os dados do novo ator a adicionar à base de dados?(S/N):\n")
                                     else:

@@ -15,7 +15,7 @@ cur = conn.cursor()
 #==========================================================================================================================
 #Variáveis globais
 utilizador_atual = 0    #Utilizador com login efetuado
-
+erro_login = False
 
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #                                                             ECRÃ INICIAL
@@ -83,10 +83,11 @@ def login():
                     utilizador_atual = cur.fetchone()[0]
                     break
                 else:
-                    print("\nPassword errada")
+                    print(f"\nPassword errada")
             break
         else:
             print("\nEndereço de email inválido")
+
     return
 
 
@@ -146,13 +147,13 @@ def menu_cliente():
         print("\n-------------------------------------MENU CLIENTE-----------------------------------------------\n")
 
         escolha_admin = input("""
-                              1 - Estatísticas
+                              1 - Ver Saldo
                               V|v- Logout
 
         Ver: """)
 
         if escolha_admin == "1":
-            admin_estatisticas()
+            saldos_cliente()
 
         elif escolha_admin == "V" or escolha_admin== "v":
             print("LOGOUT")
@@ -160,6 +161,39 @@ def menu_cliente():
 
         else:
             print("Inválido\nTenta outra vez")
+
+
+#==========================================================================================================================
+#Menu CLIENTE - Saldo
+def saldos_cliente():
+    #-----------------------------------------------MENU SALDO-----------------------------------------------------
+    saldos = True
+
+    #PEDE AO CLIENTE QUE TIPO DE PESQUISA QUER EFETUAR
+    while saldos:
+
+        print("----------------------MENU SALDO---------------------\n")
+
+        cur.execute(f"SELECT saldo from cliente where utilizador_id = '{utilizador_atual}';")
+
+        s1 = cur.fetchone()
+
+        if s1 is None:
+            print("Resultado não encontrado!")
+
+        while s1 is not None:
+            print("\t\t    Saldo ->", *s1, '€')
+            s1 = cur.fetchone()
+
+        s = input("\n\t\t      V|v - Voltar\n\t\t\t   ")
+
+        #Volta ao menu anterior
+        if s == "V" or s == "v":
+            saldos = False
+
+        else:
+            print("Inválido")
+            print("Tenta outra vez")
 
 
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\

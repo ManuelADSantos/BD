@@ -85,13 +85,13 @@ def inventario():
 
     inv = True
     while inv:
-            print("----------------------INVENTÁRIO---------------------")
-            print("\nO Que pretende fazer?\n")
+            
+            print("\nO que pretende fazer?\n")
 
             det = input("""
                                     1 - Ver Detalhes do Artigo
                                     V|v - Voltar
-    
+
                 Resposta: """)
 
             # ----------------------------------------- VER DETALHES ARTIGO-------------------------------------------------
@@ -170,7 +170,7 @@ def lista():
         det = input("""
                                            1 - Ver Detalhes do Artigo
                                            V|v - Voltar
-    
+
                        Resposta: """)
 
     # ----------------------------------------- VER DETALHES ARTIGO-------------------------------------------------
@@ -205,8 +205,8 @@ def lista():
 
             while True:
 
-                det1 = input("""Prentende ALUGAR? 
-            
+                det1 = input("""Prentende ALUGAR?
+
                 Responda (S|N): """)
 
                 if det1 == "S" or det1 == "s":
@@ -231,7 +231,7 @@ def lista():
             print("Inválido")
             print("Tenta outra vez")
 
-alugueres()
+inventario()
 
 # Fecha a ligação à base de dados
 cur.close()

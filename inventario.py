@@ -67,7 +67,6 @@ def historico(art):
                 cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                 chave = cur.fetchone()[0]
                 if confirmar == chave:
-                    cur.execute(f"SELECT mudar_estado({art});");
                     cur.execute(f"INSERT INTO historico_precos(id,preco, entrada_em_vigor, atual, artigo_id) VALUES (DEFAULT,{p}, CURRENT_TIMESTAMP, True, {art});")
                     print("Preço Alterado!")
                     conn.commit()

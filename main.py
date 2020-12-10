@@ -5,7 +5,6 @@ from getpass import getpass
 import os
 import datetime
 
-
 #==========================================================================================================================
 # Estabelecer ligação à base de dados
 conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=postgres")
@@ -18,7 +17,9 @@ cur = conn.cursor()
 utilizador_atual = 0    #Utilizador com login efetuado
 
 
-#==========================================================================================================================
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+#                                                             ECRÃ INICIAL
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #Início/Ecrã inicial
 def inicio():
     while True:
@@ -49,7 +50,7 @@ def inicio():
                 if ser_admin is not None:       #ADMIN
                     menu_admin()
                 elif ser_admin is None:         #CLIENTE
-                    print("MENU CLIENTE")
+                    menu_cliente()
 
             elif(inicio_escolha == 2):      #Registo
                 registo()
@@ -135,11 +136,35 @@ def registo():
             print("Dados não válidos")
 
 
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+#                                                               CLIENTE
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #==========================================================================================================================
 #Menu CLIENTE
+def menu_cliente():
+    while True:
+        print("\n-------------------------------------MENU CLIENTE-----------------------------------------------\n")
+
+        escolha_admin = input("""
+                              1 - Estatísticas
+                              V|v- Logout
+
+        Ver: """)
+
+        if escolha_admin == "1":
+            admin_estatisticas()
+
+        elif escolha_admin == "V" or escolha_admin== "v":
+            print("LOGOUT")
+            return
+
+        else:
+            print("Inválido\nTenta outra vez")
 
 
-#==========================================================================================================================
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+#                                                               ADMIN
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #Menu ADMIN
 def menu_admin():
     while True:
@@ -176,6 +201,7 @@ def menu_admin():
 
         else:
             print("Inválido\nTenta outra vez")
+
 
 #==========================================================================================================================
 #Menu ADMIN - Inventário, detalhes e condições de aluguer
@@ -222,19 +248,13 @@ def inventario():
                                 print(detalhes)
                                 detalhes = cur.fetchone()
 
-                            print("\n Mais detalhes: \n")
                             while True:
-
-                                det1 = input("""
-                                            1- Histórico de preços
-                                            2- Condições de Aluguer
-                                            V|v - Voltar
-                                VER: """)
+                                print("\n\t\t\t     Mais detalhes: \n")
+                                det1 = input("""\t\t\t1- Histórico de preços\n\t\t\t2- Condições de Aluguer\n\t\t\t     V|v - Voltar\n\t\t\t\t   """)
 
                                 #Histórico de preços
                                 if det1 == "1":
                                     historico(artdet)
-                                    break
 
                                 #Condições de aluguer
                                 elif det1 == "2":
@@ -246,7 +266,6 @@ def inventario():
                                     for linha in cur.fetchall():
                                         periodo_de_aluguer, preco = linha
                                         print("Período de aluguer(em meses): ", periodo_de_aluguer, "| Preço: ", preco, " €")
-                                    break
 
                                 #Voltar
                                 elif det1 == "V" or det1 == "v":
@@ -265,12 +284,13 @@ def inventario():
 
         # Volta ao Inventário
         elif det == "V" or det == "v":
-            break
+            return
 
         # Input não válido
         else:
             print("\n\t\t\t\t\tInválido")
             print("\t\t\t\t     Tenta outra vez\n")
+
 
 #==========================================================================================================================
 #Menu ADMIN - Histórico de preços
@@ -285,7 +305,7 @@ def historico(art):
         print("Preço: ", preco, "€ | Entrada em vigor: ", entrada_em_vigor, " | Atual?:", atual)
 
     while True:
-        corrigir = input("\nCorrigir Preço? (S|N): \n")
+        corrigir = input("\nAlterar Preço? (S|N): \n")
 
         if corrigir == "S" or corrigir == "s":
 
@@ -307,22 +327,21 @@ def historico(art):
                 cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                 chave = cur.fetchone()[0]
                 if confirmar == chave:
-                    cur.execute(f"SELECT mudar_estado({art});");
                     cur.execute(f"INSERT INTO historico_precos(id,preco, entrada_em_vigor, atual, artigo_id) VALUES (DEFAULT,{p}, CURRENT_TIMESTAMP, True, {art});")
                     print("Preço Alterado!")
                     conn.commit()
-                    break
+                    return
                 else:
                     tentativas -= 1
                     print(f"\nChave errada. Tem {tentativas} tentativas restantes")
                     if tentativas == 0:
                         print("\nAlteração de preço cancelada!")
-                        break
+                        return
 
             break
 
         elif corrigir == "N" or corrigir == "n":
-            break
+            return
 
 
 #==========================================================================================================================
@@ -409,10 +428,10 @@ def admin_mensagens():
                     while True:
                         print("Clientes aos quais é possível enviar mensagem\n")
                         cur.execute("SELECT utilizador_id, nome FROM cliente, utilizador WHERE utilizador_id = id")
+                        #print(cur.fetchall())
                         for linha in cur.fetchall():
-                            x1 = linha['utilizador_id']
-                            x2 = linha['nome']
-                            print("-> ID:", x1,"/Nome: ", x2)
+                            utilizador_id, nome = linha
+                            print("-> ID:", utilizador_id,"/Nome: ", nome)
 
                         try:
                             cliente_msg = int(input("Qual o ID do cliente ao qual pretende enviar mensagem?\n"))
@@ -709,7 +728,7 @@ def admin_adicionarartigo():
 
 
 #==========================================================================================================================
-#Menu ADMIN - Adicionar Artigos
+#Menu ADMIN - Remover Artigos
 def admin_removerartigo():
     while True:
         print("\n-------------------------------------Remover Artigo-----------------------------------------------\n Artigos disponiveis para remoção\n NOTA:(ID,Título, Tipo de Artigo, Realizador, Produtor, Ano, Período de Aluguer)\n\n")
@@ -788,8 +807,8 @@ def admin_estatisticas():
                               3 - Número de artigos por tipo
                               4 - Valor total dos artigos alugados no momento atual
                               5 - Valor total dos alugueres desde sempre
-                              6 - Cliente com mais alugueres
-                              7 - Artigo mais alugado
+                              6 - Cliente atualmente com mais alugueres
+                              7 - Artigo atualmente mais alugado
                               V|v- Voltar
 
         Ver: """)
@@ -846,7 +865,7 @@ def admin_estatisticas():
 
         #-----------------------------------Valor total dos artigos alugados no momento atual-------------------------------
         elif estatisticas == "4":
-            cur.execute("SELECT sum(historico_precos.preco) FROM historico_precos JOIN artigo ON historico_precos.artigo_id = artigo.id JOIN aluguer ON artigo.id = aluguer.artigo_id WHERE historico_precos.atual = True AND aluguer.ativo = True;")
+            cur.execute("SELECT sum(preco_aluguer) FROM aluguer WHERE ativo = True;")
             valortotal = cur.fetchone()
 
             if valortotal[0] is None:
@@ -858,7 +877,7 @@ def admin_estatisticas():
         #--------------------------------------Valor total dos alugueres desde sempre---------------------------------------
         elif estatisticas == "5":
 
-            cur.execute("SELECT sum(historico_precos.preco) FROM historico_precos JOIN artigo ON historico_precos.artigo_id = artigo.id JOIN aluguer ON artigo.id = aluguer.artigo_id WHERE historico_precos.atual = True;")
+            cur.execute("SELECT sum(preco_aluguer) FROM aluguer ;")
 
             print("Valor total dos Alugueres desde sempre:")
             alugueres = cur.fetchone()
@@ -875,7 +894,7 @@ def admin_estatisticas():
 
             cur.execute("SELECT utilizador.nome, '| nº de alugueres:' ,count(*) as total from utilizador join cliente on utilizador.id = cliente.utilizador_id join aluguer on cliente.utilizador_id = aluguer.cliente_utilizador_id where aluguer.ativo = True GROUP by utilizador.nome order by total DESC LIMIT 10;")
 
-            print("TOP 10 -> Cliente com mais alugueres: ")
+            print("TOP 10 -> Cliente atualmente com mais alugueres: ")
             clientemvp = cur.fetchone()
 
             if clientemvp is None:
@@ -889,7 +908,7 @@ def admin_estatisticas():
         elif estatisticas == "7":
             cur.execute("SELECT artigo.titulo, '|nº vezes alugado: ', count(*) as total from artigo join aluguer on artigo.id = aluguer.artigo_id where aluguer.ativo = True GROUP by artigo.titulo order by total DESC LIMIT 10;")
 
-            print("TOP 10 - Artigo mais alugado atualmente:")
+            print("TOP 10 - Artigo atualmente mais alugado:")
             artigoalugado = cur.fetchone()
 
             if artigoalugado is None:
@@ -907,12 +926,12 @@ def admin_estatisticas():
         else:
             print("Inválido\nTente outra vez")
 
-#==========================================================================================================================
+
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+#                                                                INÍCIO
+#/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #Iniciar programa
 inicio()
-
-
-
 
 
 

@@ -275,19 +275,37 @@ def inventario():
                            print(f"Não existe um artigo com o ID {artdet}")
                            break
                         else:
-                            while detalhes is not None:
-                                print("\nDetalhes do artigo: ")
-                                print("[ Título | Tipo | Realizador | Produtor | Ano ]")
-                                print(detalhes)
-                                detalhes = cur.fetchone()
-                                                            
+                            print("\nDetalhes do artigo: ")
+                            print(f"Título: {detalhes[0]} | Tipo: {detalhes[1]} | Realizador: {detalhes[2]} | Produtor: {detalhes[3]} | Ano: {detalhes[4]} ")
+
+
+                            try:
+                                cur.execute(f"SELECT nome FROM atores, artigo_atores WHERE atores.id = artigo_atores.atores_id and artigo_id = {artdet};")
+                                nomes = cur.fetchone()
+                                if nomes is None:
+                                    print("Atores : N/A")
+                                else:
+                                    print(f"Atores: ")
+                                    while nomes is not None:
+                                        print(" ", *nomes)
+                                        nomes = cur.fetchone()
+                            except:
+                                print("Atores : N/A")
+
+
+                            print("\n Mais detalhes: \n")
                             while True:
-                                print("\n\t\t\t     Mais detalhes: \n")
-                                det1 = input("""\t\t\t1- Histórico de preços\n\t\t\t2- Condições de Aluguer\n\t\t\t     V|v - Voltar\n\t\t\t\t   """)
+
+                                det1 = input("""
+                                            1- Histórico de preços
+                                            2- Condições de Aluguer
+                                            V|v - Voltar
+                                VER: """)
 
                                 #Histórico de preços
                                 if det1 == "1":
                                     historico(artdet)
+                                    break
 
                                 #Condições de aluguer
                                 elif det1 == "2":
@@ -299,6 +317,7 @@ def inventario():
                                     for linha in cur.fetchall():
                                         periodo_de_aluguer, preco = linha
                                         print("Período de aluguer(em meses): ", periodo_de_aluguer, "| Preço: ", preco, " €")
+                                    break
 
                                 #Voltar
                                 elif det1 == "V" or det1 == "v":
@@ -317,7 +336,7 @@ def inventario():
 
         # Volta ao Inventário
         elif det == "V" or det == "v":
-            return
+            break
 
         # Input não válido
         else:
@@ -965,8 +984,6 @@ def admin_estatisticas():
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #Iniciar programa
 inicio()
-
-
 
 
 #==========================================================================================================================

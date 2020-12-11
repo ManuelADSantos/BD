@@ -191,11 +191,11 @@ def cliente_mensagens():
                 print("\n|                     MENSAGENS NÃO LIDAS                      |")
                 print("\n================================================================")
 
-                cur.execute(f"SELECT mensagem_id, corpo FROM cliente_mensagem, mensagem WHERE cliente_utilizador_id = {utilizador_atual} AND cliente_mensagem.mensagem_id = mensagem.id ORDER BY mensagem_id ASC;")
-                dados = cur.fetchone()
-                if dados is not None:
-                    id_mensagem = dados[0]
-                    print("\n\t\t    || CORPO DA MENSAGEM ||\n\n", dados[1])
+                cur.execute(f"SELECT cliente_mensagem.mensagem_id, corpo FROM cliente_mensagem, mensagem, leitura WHERE cliente_mensagem.cliente_utilizador_id = {utilizador_atual} AND cliente_mensagem.mensagem_id = mensagem.id AND leitura.lida IS NULL ORDER BY mensagem_id ASC;")
+                corpo = cur.fetchone()
+                if corpo is not None:
+                    id_mensagem = corpo[0]
+                    print("\n\t\t    || CORPO DA MENSAGEM ||\n\n", corpo[1])
 
                     #Administrador que enviou a mensagem
                     cur.execute(f"SELECT nome FROM utilizador WHERE id = (SELECT administrador_utilizador_id FROM mensagem_administrador WHERE mensagem_id = {id_mensagem});")
@@ -207,7 +207,7 @@ def cliente_mensagens():
                             break
 
                     if opcao == "1":
-                        cur.execute(f"INSERT INTO leitura(lida, mensagem_id, cliente_utilizador_id) VALUES (CURRENT_TIMESTAMP, {id_mensagem}, {utilizador_atual});")
+                        cur.execute(f"UPDATE leitura SET lida = CURRENT_TIMESTAMP WHERE cliente_utilizador_id = {utilizador_atual} AND mensagem_id = {id_mensagem};")
                         conn.commit()
                     elif opcao == "v" or opcao == "V":
                         break

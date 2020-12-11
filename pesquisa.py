@@ -247,6 +247,7 @@ def pesquisa_geral():
                 print("->", *p_ano)
 
                 p_ano = cur.fetchone()
+    return
 
 # -------------------------------------Pesquisa aos artigos neste momento alugados pelo cliente--------------------------
 def pesquisa_user():
@@ -456,6 +457,9 @@ def pesquisa_user():
             while p_ano is not None:
                 print("->", *p_ano)
                 p_ano = cur.fetchone()
+
+    return
+
 
 menu_pesquisar()
 

@@ -457,13 +457,6 @@ def pesquisa_user():
                 print("->", *p_ano)
                 p_ano = cur.fetchone()
 
-        elif pesquisa == "V" or pesquisa == "v":
-            print("Voltar ao MENU PESQUISA")
-
-        else:
-            print("Inválido!")
-            print("Tenta outra vez \n")
-
 menu_pesquisar()
 
 # Fecha a ligação à base de dados

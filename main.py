@@ -206,9 +206,126 @@ def saldos_cliente():
 #==========================================================================================================================
 #Menu CLIENTE - Mensagens
 def mensagens_cliente():
-    print("MENSAGENS")
-    return
+    while True:
+        print("\n================================================================")
+        print("\n|                           MENSAGENS                          |")
+        print("\n================================================================")
+        cur.execute(f"SELECT mensagem_id FROM cliente_mensagem WHERE cliente_utilizador_id = {utilizador_atual} EXCEPT SELECT mensagem_id FROM leitura WHERE lida IS NOT NULL AND cliente_utilizador_id = {utilizador_atual};")
+        print(f"\n\t            Tem {len(cur.fetchall())} mensagens não lidas ")
 
+
+
+        msg = input("""
+
+                  || 1 - MENSAGENS NÃO LIDAS ||
+                  || 2 - MENSAGENS JÁ LIDAS  ||
+                  ||       V|v - Voltar      ||
+
+                                """)
+        if msg == "1":
+            while True:
+                print("\n\n\t\t || A ABRIR MENSAGENS NÃO LIDAS ||")
+                print("\n================================================================")
+                print("\n|                     MENSAGENS NÃO LIDAS                      |")
+                print("\n================================================================")
+
+                cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo FROM mensagem, leitura WHERE leitura.lida IS NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
+                corpo = cur.fetchone()
+                if corpo is not None:
+                    #Corpo da mensagem
+                    id_mensagem = corpo[0]
+                    print("\n\t\t    || CORPO DA MENSAGEM ||\n\n", corpo[1])
+
+                    #Administrador que enviou a mensagem
+                    cur.execute(f"SELECT nome FROM utilizador WHERE id = (SELECT administrador_utilizador_id FROM mensagem_administrador WHERE mensagem_id = {id_mensagem});")
+                    print("\n\n    -- De", cur.fetchone()[0], " --")
+
+                    while True:
+                        opcao = input("\n\t\t|| ENTER - PRÓXIMA MENSAGEM ||\n\t\t|| v/V - VOLTAR A MENSAGENS ||\n\t\t\t       ")
+                        if opcao == "" or opcao == "v" or opcao == "V":
+                            print("\n\t\t   || A VOLTAR A MENSAGENS ||")
+                            break
+
+                    if opcao == "":
+                        cur.execute(f"UPDATE leitura SET lida = CURRENT_TIMESTAMP WHERE cliente_utilizador_id = {utilizador_atual} AND mensagem_id = {id_mensagem};")
+                        conn.commit()
+                    elif opcao == "v" or opcao == "V":
+                        cur.execute(f"UPDATE leitura SET lida = CURRENT_TIMESTAMP WHERE cliente_utilizador_id = {utilizador_atual} AND mensagem_id = {id_mensagem};")
+                        conn.commit()
+                        break
+                else:
+                    print("\n\t\t   Não tem mensagens não lidas\n\n\t\t   || A VOLTAR A MENSAGENS ||")
+                    break
+
+        elif msg == "2":
+            while True:
+                print("\n\n\t\t || A ABRIR MENSAGENS JÁ LIDAS ||")
+                print("\n================================================================")
+                print("\n|                      MENSAGENS JÁ LIDAS                       |")
+                print("\n================================================================\n")
+
+                cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo, administrador_utilizador_id FROM mensagem, leitura, mensagem_administrador WHERE leitura.lida IS NOT NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
+                dados = cur.fetchall()
+                if len(dados) == 0:
+                    print("\n\t\t   Não tem mensagens já lidas\n\n\t\t   || A VOLTAR A MENSAGENS ||")
+                    break
+                else:
+                    for ind in range(len(dados)):
+                        #ID da mensagem
+                        id_mensagem = dados[ind][0]
+
+                        #Corpo da mensagem
+                        if len(dados[ind][1]) > 15:
+                            corpo = ""
+                            for i in range(15):
+                                corpo += dados[ind][1][i]
+                            corpo += "  [...]"
+                        else:
+                            corpo = dados[ind][1]
+
+                        #Administrador que enviou a mensagem
+                        admin_id = dados[ind][2]
+                        cur.execute(f"SELECT nome FROM utilizador WHERE id = {admin_id}")
+                        admin = cur.fetchone()[0]
+
+                        #Mostrar resulado
+                        print("ID: ",id_mensagem, " |Remetente: ",admin," |Corpo: ",corpo)
+                    while True:
+                        sair = False
+                        opcao = input("\n\t        || ID - VER MENSAGEM COMPLETA ||\n\t        ||  v/V - VOLTAR A MENSAGENS  ||\n\t\t\t        ")
+                        while True:
+                            try:
+                                opcao = int(opcao)
+                                cur.execute(f"SELECT corpo FROM mensagem WHERE id = {opcao}")
+                                valido = cur.fetchone()
+                                if valido is None:
+                                    print("\n\t\t           ID INVÁLIDO\n")
+                                else:
+                                    print(f"\n\t\t/\/\/\ MENSAGEM {opcao} COMPLETA /\/\/\ \n")
+                                    print("  ", *valido)
+                                    print(f"\n\t\t\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ \n")
+                                break
+
+                            except:
+                                if opcao == "v" or opcao == "V":
+                                    print("\n\t\t   || A VOLTAR A MENSAGENS ||")
+                                    sair = True
+                                    break
+                                else:
+                                    print("\n\t\t         OPÇÃO INVÁLIDA\n")
+                                    break
+                        if sair:
+                            break
+
+                    break
+
+
+        elif msg == "v" or msg =="V":
+            print("\n\t\t|| A VOLTAR AO MENU PRINCIPAL ||")
+            return
+
+        else:
+            print("")
 
 #==========================================================================================================================
 #Menu CLIENTE - PESQUISAR
@@ -680,19 +797,19 @@ def menu_admin():
         Ver: """)
 
         if escolha_admin == "1":
-            admin_estatisticas()
+            estatisticas_admin()
 
         elif escolha_admin == "2":
-            admin_adicionarartigo()
+            adicionarartigo_admin()
 
         elif escolha_admin == "3":
-            admin_removerartigo()
+            removerartigo_admin()
 
         elif escolha_admin == "4":
-            admin_mensagens()
+            mensagens_admin()
 
         elif escolha_admin == "5":
-            admin_inventario()
+            inventario_admin()
 
         elif escolha_admin == "V" or escolha_admin== "v":
             print("LOGOUT")
@@ -704,7 +821,7 @@ def menu_admin():
 
 #==========================================================================================================================
 #Menu ADMIN - Inventário, detalhes, condições de aluguer histórico de preços
-def admin_inventario():
+def inventario_admin():
     while True:
         print("---------------------------------INVENTÁRIO DE ARTIGOS----------------------------------------")
 
@@ -863,7 +980,7 @@ def historico(art):
 
 #==========================================================================================================================
 #Menu ADMIN - Mensagens
-def admin_mensagens():
+def mensagens_admin():
     while True:
         print("----------------------MENU MENSAGENS---------------------")
         print("\n Que mensagem pretende enviar? \n")
@@ -1027,7 +1144,7 @@ def admin_mensagens():
 
 #==========================================================================================================================
 #Menu ADMIN - Adicionar Artigos
-def admin_adicionarartigo():
+def adicionarartigo_admin():
     while True:
         print("\n-------------------------------------Adicionar Artigo-----------------------------------------------\n")
 
@@ -1253,7 +1370,7 @@ def admin_adicionarartigo():
 
 #==========================================================================================================================
 #Menu ADMIN - Remover Artigos
-def admin_removerartigo():
+def removerartigo_admin():
     while True:
         print("\n-------------------------------------Remover Artigo-----------------------------------------------\n Artigos disponiveis para remoção\n NOTA:(ID,Título, Tipo de Artigo, Realizador, Produtor, Ano, Período de Aluguer)\n\n")
         cur.execute("SELECT (artigo.id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer) FROM artigo EXCEPT SELECT (artigo.id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer) FROM artigo INNER JOIN aluguer ON artigo.id = aluguer.artigo_id")
@@ -1321,7 +1438,7 @@ def admin_removerartigo():
 
 #==========================================================================================================================
 #Menu ADMIN - Estatísticas
-def admin_estatisticas():
+def estatisticas_admin():
     while True:
         print("\n-------------------------------------Estatísticas:-----------------------------------------------\n")
 

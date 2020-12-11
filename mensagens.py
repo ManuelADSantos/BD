@@ -200,15 +200,15 @@ def cliente_mensagens():
 
                     #Administrador que enviou a mensagem
                     cur.execute(f"SELECT nome FROM utilizador WHERE id = (SELECT administrador_utilizador_id FROM mensagem_administrador WHERE mensagem_id = {id_mensagem});")
-                    print("\n Atenciosamente, \n\t", cur.fetchone()[0])
+                    print("\n\n    -- De", cur.fetchone()[0], " --")
 
                     while True:
-                        opcao = input("\n\t\t ||   1 - PRÓXIMA MENSAGEM   ||\n\t\t || v/V - VOLTAR A MENSAGENS ||\n\t\t\t       ")
-                        if opcao == "1" or opcao == "v" or opcao == "V":
+                        opcao = input("\n\t\t|| ENTER - PRÓXIMA MENSAGEM ||\n\t\t|| v/V - VOLTAR A MENSAGENS ||\n\t\t\t       ")
+                        if opcao == "" or opcao == "v" or opcao == "V":
                             print("\n\t\t   || A VOLTAR A MENSAGENS ||")
                             break
 
-                    if opcao == "1":
+                    if opcao == "":
                         cur.execute(f"UPDATE leitura SET lida = CURRENT_TIMESTAMP WHERE cliente_utilizador_id = {utilizador_atual} AND mensagem_id = {id_mensagem};")
                         conn.commit()
                     elif opcao == "v" or opcao == "V":
@@ -224,7 +224,7 @@ def cliente_mensagens():
                 print("\n\n\t\t || A ABRIR MENSAGENS JÁ LIDAS ||")
                 print("\n================================================================")
                 print("\n|                      MENSAGENS JÀ LIDAS                       |")
-                print("\n================================================================")
+                print("\n================================================================\n")
 
                 cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo, administrador_utilizador_id FROM mensagem, leitura, mensagem_administrador WHERE leitura.lida IS NOT NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
                 dados = cur.fetchall()
@@ -252,21 +252,32 @@ def cliente_mensagens():
 
                         #Mostrar resulado
                         print("ID: ",id_mensagem, " |Remetente: ",admin," |Corpo: ",corpo)
-
-                    opcao = input("\n\t        || ID - VER MENSAGEM COMPLETA ||\n\t        ||  v/V - VOLTAR A MENSAGENS  ||\n\t\t\t        ")
                     while True:
-                        try:
-                            opcao = int(opcao)
-                            print("Válido")
-                            break
+                        sair = False
+                        opcao = input("\n\t        || ID - VER MENSAGEM COMPLETA ||\n\t        ||  v/V - VOLTAR A MENSAGENS  ||\n\t\t\t        ")
+                        while True:
+                            try:
+                                opcao = int(opcao)
+                                cur.execute(f"SELECT corpo FROM mensagem WHERE id = {opcao}")
+                                valido = cur.fetchone()
+                                if valido is None:
+                                    print("\n\t\t           ID INVÁLIDO\n")
+                                else:
+                                    print(f"\n\t\t/\/\/\ MENSAGEM {opcao} COMPLETA /\/\/\ \n")
+                                    print("  ", *valido)
+                                    print(f"\n\t\t\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ \n")
+                                break
 
-                        except:
-                            if opcao == "v" or opcao == "V":
-                                print("\n\t\t   || A VOLTAR A MENSAGENS ||")
-                                break
-                            else:
-                                print("Inválido")
-                                break
+                            except:
+                                if opcao == "v" or opcao == "V":
+                                    print("\n\t\t   || A VOLTAR A MENSAGENS ||")
+                                    sair = True
+                                    break
+                                else:
+                                    print("\n\t\t         OPÇÃO INVÁLIDA\n")
+                                    break
+                        if sair:
+                            break
 
                     break
 

@@ -792,6 +792,7 @@ def menu_admin():
                               3 - Remover Artigo
                               4 - Enviar Mensagens
                               5 - Inventário de Artigos(detalhes e histórico de preços)
+                              6 - Alterar Saldo de Cliente
                               V|v- Logout
 
         Ver: """)
@@ -810,6 +811,9 @@ def menu_admin():
 
         elif escolha_admin == "5":
             inventario_admin()
+
+        elif escolha_admin == "6":
+            alterarsaldo_admin()
 
         elif escolha_admin == "V" or escolha_admin== "v":
             print("LOGOUT")
@@ -1436,6 +1440,7 @@ def removerartigo_admin():
 
     return
 
+
 #==========================================================================================================================
 #Menu ADMIN - Estatísticas
 def estatisticas_admin():
@@ -1566,6 +1571,73 @@ def estatisticas_admin():
 
         else:
             print("Inválido\nTente outra vez")
+
+
+#==========================================================================================================================
+#Menu ADMIN - Alterar Saldo
+def alterarsaldo_admin():
+    while True:
+        print("------------------------------- ALTERAR SALDO -------------------------------\n")
+        cur.execute("SELECT utilizador_id, nome, saldo FROM cliente, utilizador WHERE cliente.utilizador_id = utilizador.id;")
+        dados = cur.fetchall()
+        if len(dados) == 0:
+            print("\n\t\t   Não existem clientes registados\n\n\t\t   || A VOLTAR AO MENU ||")
+            break
+        else:
+            for ind in range(len(dados)):
+                print("\t\t  ID: ", dados[ind][0], " |Nome: ", dados[ind][1], "|Saldo: ", dados[ind][2],"€")
+
+
+            cliente_escolhido = input("\n\t\t\tID - Cliente a alterar o saldo\n\t\t\t     v/V - Voltar ao Menu\n\t\t\t\t       ")
+
+            #Voltar ao menu principal
+            if (cliente_escolhido == "v" or cliente_escolhido == "V"):
+                print("De volta ao MENU")
+                break
+            try:
+                #Verificar se ID existe
+                teste = int(cliente_escolhido)
+                if isinstance(teste, int):
+                    cur.execute(f"SELECT nome, saldo FROM utilizador, cliente WHERE utilizador_id = {cliente_escolhido}")
+                    verif = cur.fetchone()
+                    if verif is not None:
+                        saldo_atual = verif[1]
+                        try:
+                            valor = -1
+                            while valor < 0:
+                                valor = float(input("Indique o valor a aumentar no saldo: "))
+                                if valor < 0:
+                                    print("O valor deve ser positivo")
+                                else:
+                                    try:
+                                        saldo_novo = saldo_atual + valor
+                                        tentativas = 3
+                                        while tentativas > 0:
+                                            confirmar = getpass("Introduza a sua chave de administrador para confirmar a alteração do saldo:\n")
+                                            cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
+                                            chave = cur.fetchone()[0]
+                                            cur.execute(f"UPDATE cliente SET saldo = {saldo_novo} WHERE utilizador_id = {cliente_escolhido}")
+                                            if confirmar == chave:
+                                                print("\nSaldo alterado com sucesso")
+                                                conn.commit()
+                                                break
+                                            else:
+                                                tentativas -= 1
+                                                print(f"\nChave errada. Tem {tentativas} tentativas restantes")
+                                                if tentativas == 0:
+                                                    print("\nAlteração de saldo cancelada!")
+                                                    conn.rollback()
+                                                    break
+                                    except:
+                                        print("ERRO NA INSERÇÃO")
+                        except ValueError:
+                            print("VALOR INVÁLIDO")
+                    else:
+                        print("NÃO EXISTE UM CLIENTE CUJO ID É O INSERIDO")
+            except:
+                #Valores não numéricos não são avaliados
+                print("VALOR INVÁLIDO")
+
 
 
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\

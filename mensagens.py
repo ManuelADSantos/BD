@@ -227,35 +227,17 @@ def cliente_mensagens():
                 print("\n================================================================")
 
                 cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo, administrador_utilizador_id FROM mensagem, leitura, mensagem_administrador WHERE leitura.lida IS NOT NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
-                dados = cur.fetchall()
-                if dados is not None:
-                    while dados is not None:
-                        #ID da mensagem
-                        id_mensagem = dados[0]
+                dados = cur.fetchone()
 
-                        #Corpo da mensagem
-                        if len(dados[1]) > 15:
-                            corpo = ""
-                            for i in range(12):
-                                corpo += dados[1][i]
-                            corpo += "  [...]"
-                        else:
-                            corpo = dados[1]
-
-                        #Administrador que enviou a mensagem
-                        admin_id = dados[2]
-                        cur.execute(f"SELECT nome FROM utilizador WHERE id = {admin_id}")
-                        admin = cur.fetchone()[0]
-
-                        print(f"ID: {id_mensagem} |Remetente: {admin} |Corpo: {corpo}")
-
-
-                    break
-
-                elif dados is None:
+                if dados is None:
                     print("\n\t\t   Não tem mensagens já lidas\n\n\t\t   || A VOLTAR A MENSAGENS ||")
                     break
 
+                while dados is not None:
+                    print("->", *dados)
+                    dados = cur.fetchone()
+
+                break
 
         elif msg == "v" or msg =="V":
             return

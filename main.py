@@ -148,6 +148,7 @@ def menu_cliente():
         escolha_admin = input("""
                               1 - Ver Saldo
                               2 - Pesquisa
+                              3 - Mensagens
                               V|v- Logout
 
         Ver: """)
@@ -156,7 +157,10 @@ def menu_cliente():
             saldos_cliente()
 
         if escolha_admin == "2":
-            saldos_cliente()
+            pesquisar_clientes()
+
+        if escolha_admin == "3":
+            mensagens_cliente()
 
         elif escolha_admin == "V" or escolha_admin== "v":
             print("LOGOUT")
@@ -201,12 +205,14 @@ def saldos_cliente():
 
 #==========================================================================================================================
 #Menu CLIENTE - Mensagens
-
+def mensagens_cliente():
+    print("MENSAGENS")
+    return
 
 
 #==========================================================================================================================
 #Menu CLIENTE - PESQUISAR
-def menu_pesquisar():
+def pesquisar_clientes():
 
     pesquisarmenu = True
 
@@ -239,7 +245,7 @@ def menu_pesquisar():
             print("Tenta outra vez")
 
 
-# -----------------------------------------------Pesquisa a todos os artigos do sistema---------------------------------------------
+# -----------------------------------------------Pesquisa a todos os artigos do sistema------------------------------------
 def pesquisa_geral():
     pesquisageral = True
     ordenar = False
@@ -443,7 +449,7 @@ def pesquisa_geral():
                 p_ano = cur.fetchone()
     return
 
-# -------------------------------------Pesquisa aos artigos neste momento alugados pelo cliente--------------------------
+# -------------------------------------Pesquisa aos artigos neste momento alugados pelo cliente----------------------------
 def pesquisa_user():
 
     cliente_atual = 2
@@ -686,7 +692,7 @@ def menu_admin():
             admin_mensagens()
 
         elif escolha_admin == "5":
-            inventario()
+            admin_inventario()
 
         elif escolha_admin == "V" or escolha_admin== "v":
             print("LOGOUT")
@@ -698,7 +704,7 @@ def menu_admin():
 
 #==========================================================================================================================
 #Menu ADMIN - Inventário, detalhes, condições de aluguer histórico de preços
-def inventario():
+def admin_inventario():
     while True:
         print("---------------------------------INVENTÁRIO DE ARTIGOS----------------------------------------")
 
@@ -804,7 +810,7 @@ def inventario():
             print("\t\t\t\t     Tenta outra vez\n")
 
 
-# -----------------------------------------------Histórico de preços---------------------------------------------
+# ---------------------------------------------------Histórico de preços---------------------------------------------------
 def historico(art):
 
     print("\n--------------------------------Histórico de preços----------------------------------------------\n")
@@ -884,13 +890,19 @@ def admin_mensagens():
                                 #Inserir mensagem na tabela mensagens
                                 cur.execute(f"INSERT INTO mensagem(id, corpo) VALUES (DEFAULT, '{texto}') RETURNING id;")
                                 id_mensagem = cur.fetchone()[0]
+                                print(f"CHECK 1 {id_mensagem}")
                                 #Registar mensagem na tabela mensagem_administrador
                                 cur.execute(f"INSERT INTO mensagem_administrador(mensagem_id, administrador_utilizador_id) VALUES ({id_mensagem}, {utilizador_atual});")
-                                #Registar mensagem na tabela cliente_mensagem
+                                print("CHECK 2")
+                                #Registar mensagem na tabela cliente_mensagem e leitura
                                 cur.execute("SELECT utilizador_id FROM cliente")
+                                print("CHECK 3")
                                 for linha in cur.fetchall():
                                     utilizador_id = linha[0]
                                     cur.execute(f"INSERT INTO cliente_mensagem(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {utilizador_id});")
+                                    cur.execute(f"INSERT INTO leitura(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {utilizador_id});")
+                                    print("CHECK 4")
+
                                 tentativas = 3
                                 sair = False
                                 while tentativas > 0:
@@ -969,7 +981,8 @@ def admin_mensagens():
                                 cur.execute(f"INSERT INTO mensagem_administrador(mensagem_id, administrador_utilizador_id) VALUES ({id_mensagem}, {utilizador_atual});")
                                 #Registar mensagem na tabela cliente_mensagem
                                 cur.execute(f"INSERT INTO cliente_mensagem(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {cliente_msg});")
-
+                                #Registar mensagem na tabela leitura
+                                cur.execute(f"INSERT INTO leitura(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {cliente_msg});")
                                 tentativas = 3
                                 sair = False
                                 while tentativas > 0:

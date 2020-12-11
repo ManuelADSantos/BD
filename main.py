@@ -15,7 +15,6 @@ cur = conn.cursor()
 #==========================================================================================================================
 #Variáveis globais
 utilizador_atual = 0    #Utilizador com login efetuado
-erro_login = False
 
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #                                                             ECRÃ INICIAL
@@ -278,10 +277,10 @@ def inventario():
                         else:
                             while detalhes is not None:
                                 print("\nDetalhes do artigo: ")
-                                print("[ Título | Tipo | Realizador | Produtor | Ano | Ator ]")
+                                print("[ Título | Tipo | Realizador | Produtor | Ano ]")
                                 print(detalhes)
                                 detalhes = cur.fetchone()
-
+                                                            
                             while True:
                                 print("\n\t\t\t     Mais detalhes: \n")
                                 det1 = input("""\t\t\t1- Histórico de preços\n\t\t\t2- Condições de Aluguer\n\t\t\t     V|v - Voltar\n\t\t\t\t   """)

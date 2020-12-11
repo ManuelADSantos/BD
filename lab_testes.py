@@ -18,19 +18,35 @@ utilizador_atual = 2    #Utilizador com login efetuado
 
 #Registar mensagem na tabela leitura
 
-cur.execute("SELECT artigo.titulo, '|nº vezes alugado: ', count(*) as total from artigo join aluguer on artigo.id = aluguer.artigo_id where aluguer.ativo = True GROUP by artigo.titulo order by total DESC LIMIT 10;")
+cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo, administrador_utilizador_id FROM mensagem, leitura, mensagem_administrador WHERE leitura.lida IS NOT NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
+dados = cur.fetchall()
+print(dados)
+print(len(dados))
+print(dados[0])
+print(dados[0][0])
+print(dados[0][1])
+print(dados[0][2])
 
-print("TOP 10 - Artigo atualmente mais alugado:")
-artigoalugado = cur.fetchone()
+#ID da mensagem
+id_mensagem = dados[ind][0]
 
-if artigoalugado is None:
-    print("Resultado não encontrado!")
+#Corpo da mensagem
+if len(dados[ind][1]) > 15:
+    corpo = ""
+    for i in range(12):
+        corpo += dados[ind][1][1]
+    corpo += "  [...]"
+else:
+    corpo = dados[ind][1]
 
-while artigoalugado is not None:
-    print("->", *artigoalugado)
-    artigoalugado = cur.fetchone()
+#Administrador que enviou a mensagem
+admin_id = dados[ind][2]
+cur.execute(f"SELECT nome FROM utilizador WHERE id = {admin_id}")
+admin = cur.fetchone()[0]
 
-
+#Mostrar resulado
+print(f"ID: {id_mensagem} |Remetente: {admin} |Corpo: {corpo}")
+dados = cur.fetchone()
 #==========================================================================================================================
 # Fecha a ligação à base de dados
 cur.close()

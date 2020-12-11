@@ -9,7 +9,7 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Cria um objecto (cursor) que permite executar operações sobre a base de dados
 cur = conn.cursor()
 
-#---------------------------------------------MENU SALDO CLIENTE-----------------------------------------------------
+#---------------------------------------------MENU SALDO CLIENTE----------------------------------------------------
 def saldos_cliente():
     cliente_atual = 1
 
@@ -77,7 +77,7 @@ def saldos_cliente():
             print("Inválido")
             print("Tenta outra vez")
 
-#---------------------------------------MENU SALDOS ADMIN--------------------------------------------------------------
+#---------------------------------------MENU SALDOS ADMIN-----------------------------------------------------------
 def saldos_admin():
 
     admin_atual = 5
@@ -140,6 +140,7 @@ def saldos_admin():
 
 #cur.execute("ALTER TABLE cliente ALTER COLUMN pedido_saldo DROP DEFAULT;")
 
+#---------------------------------------ADICIONAR SALDO ADMIN-------------------------------------------------------
 
 saldos_cliente()
 

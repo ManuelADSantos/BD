@@ -1,13 +1,15 @@
 #MENSAGENS
 
 import psycopg2
-
+from getpass import getpass
 # A função connect permite estabelecer uma ligação a uma base de dados
 # Verifique se a password é igual à que escolheu na instalação de PostgreSQL
 conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=postgres")
 
 # Cria um objecto (cursor) que permite executar operações sobre a base de dados
 cur = conn.cursor()
+
+utilizador_atual = 2
 
 #-----------------------------------------------MENU MENSAGENS CLIENTE-------------------------------------------------
 def admin_mensagens():
@@ -164,8 +166,68 @@ def admin_mensagens():
         if msg == "v" or msg == "V":
             break
 
+#=========================================================================================================================================
+def cliente_mensagens():
+    while True:
+        print("\n================================================================")
+        print("\n|                           MENSAGENS                          |")
+        print("\n================================================================")
+        cur.execute(f"SELECT mensagem_id FROM cliente_mensagem WHERE cliente_utilizador_id = {utilizador_atual} EXCEPT SELECT mensagem_id FROM leitura WHERE lida IS NOT NULL AND cliente_utilizador_id = {utilizador_atual};")
+        print(f"\n\t            Tem {len(cur.fetchall())} mensagens não lidas ")
+
+
+
+        msg = input("""
+
+                  || 1 - MENSAGENS NÃO LIDAS ||
+                  || 2 - MENSAGENS JÁ LIDAS  ||
+                  ||       V|v - Voltar      ||
+
+                                """)
+        if msg == "1":
+            while True:
+                print("\n\n\t\t || A ABRIR MENSAGENS NÃO LIDAS ||\n")
+                print("\n================================================================")
+                print("\n|                     MENSAGENS NÃO LIDAS                      |")
+                print("\n================================================================")
+
+                cur.execute(f"SELECT mensagem_id, corpo FROM cliente_mensagem, mensagem WHERE cliente_utilizador_id = {utilizador_atual} AND cliente_mensagem.mensagem_id = mensagem.id ORDER BY mensagem_id ASC;")
+                dados = cur.fetchone()
+                if dados is not None:
+                    id_mensagem = dados[0]
+                    print("\n\t\t    || CORPO DA MENSAGEM ||\n\n", dados[1])
+
+                    #Administrador que enviou a mensagem
+                    cur.execute(f"SELECT nome FROM utilizador WHERE id = (SELECT administrador_utilizador_id FROM mensagem_administrador WHERE mensagem_id = {id_mensagem});")
+                    print("\n Atenciosamente, \n\t", cur.fetchone()[0])
+
+                    while True:
+                        opcao = input("\n\t\t ||   1 - PRÓXIMA MENSAGEM   ||\n\t\t || v/V - VOLTAR A MENSAGENS ||\n\t\t\t       ")
+                        if opcao == "1" or opcao == "v" or opcao == "V":
+                            break
+
+                    if opcao == "1":
+                        cur.execute(f"INSERT INTO leitura(lida, mensagem_id, cliente_utilizador_id) VALUES (CURRENT_TIMESTAMP, {id_mensagem}, {utilizador_atual});")
+                        conn.commit()
+                    elif opcao == "v" or opcao == "V":
+                        break
+                else:
+                    print("\n\t\t   Não tem mensagens não lidas\n\n\t\t   || A VOLTAR A MENSAGENS ||")
+                    break
+
+        elif msg == "2":
+            print("\n================================================================")
+            print("\n|                      MENSAGENS JÀ LIDAS                       |")
+            print("\n================================================================")
+
+        elif msg == "v" or msg =="V":
+            return
+
+        else:
+            print("")
 
 cliente_mensagens()
+
 # Fecha a ligação à base de dados
 cur.close()
 conn.close()

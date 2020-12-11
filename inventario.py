@@ -121,21 +121,22 @@ def inventario():
                            print(f"Não existe um artigo com o ID {artdet}")
                            break
                         else:
-                            while detalhes is not None:
-                                print("\nDetalhes do artigo: ")
-                                print("[ Título | Tipo | Realizador | Produtor | Ano ]")
-                                print(detalhes)
-                                detalhes = cur.fetchone()
+                            print("\nDetalhes do artigo: ")
+                            print(f"Título: {detalhes[0]} | Tipo: {detalhes[1]} | Realizador: {detalhes[2]} | Produtor: {detalhes[3]} | Ano: {detalhes[4]} ")
+
 
                             try:
                                 cur.execute(f"SELECT nome FROM atores, artigo_atores WHERE atores.id = artigo_atores.atores_id and artigo_id = {artdet};")
-                                nomes = fetchone()
-                                print(f"Atores -> ")
-                                while nomes is not None:
-                                    print(" ")
-                                    nomes = fetchone()
+                                nomes = cur.fetchone()
+                                if nomes is None:
+                                    print("Atores : N/A")
+                                else:
+                                    print(f"Atores: ")
+                                    while nomes is not None:
+                                        print(" ", *nomes)
+                                        nomes = cur.fetchone()
                             except:
-                                print("Atores -> N/A")
+                                print("Atores : N/A")
 
 
                             print("\n Mais detalhes: \n")

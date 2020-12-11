@@ -227,17 +227,49 @@ def cliente_mensagens():
                 print("\n================================================================")
 
                 cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo, administrador_utilizador_id FROM mensagem, leitura, mensagem_administrador WHERE leitura.lida IS NOT NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
-                dados = cur.fetchone()
-
-                if dados is None:
+                dados = cur.fetchall()
+                if len(dados) == 0:
                     print("\n\t\t   Não tem mensagens já lidas\n\n\t\t   || A VOLTAR A MENSAGENS ||")
                     break
+                else:
+                    for ind in range(len(dados)):
+                        #ID da mensagem
+                        id_mensagem = dados[ind][0]
 
-                while dados is not None:
-                    print("->", *dados)
-                    dados = cur.fetchone()
+                        #Corpo da mensagem
+                        if len(dados[ind][1]) > 15:
+                            corpo = ""
+                            for i in range(15):
+                                corpo += dados[ind][1][i]
+                            corpo += "  [...]"
+                        else:
+                            corpo = dados[ind][1]
 
-                break
+                        #Administrador que enviou a mensagem
+                        admin_id = dados[ind][2]
+                        cur.execute(f"SELECT nome FROM utilizador WHERE id = {admin_id}")
+                        admin = cur.fetchone()[0]
+
+                        #Mostrar resulado
+                        print("ID: ",id_mensagem, " |Remetente: ",admin," |Corpo: ",corpo)
+
+                    opcao = input("\n\t        || ID - VER MENSAGEM COMPLETA ||\n\t        ||  v/V - VOLTAR A MENSAGENS  ||\n\t\t\t        ")
+                    while True:
+                        try:
+                            opcao = int(opcao)
+                            print("Válido")
+                            break
+
+                        except:
+                            if opcao == "v" or opcao == "V":
+                                print("\n\t\t   || A VOLTAR A MENSAGENS ||")
+                                break
+                            else:
+                                print("Inválido")
+                                break
+
+                    break
+
 
         elif msg == "v" or msg =="V":
             return

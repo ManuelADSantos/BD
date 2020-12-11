@@ -191,7 +191,7 @@ def cliente_mensagens():
                 print("\n|                     MENSAGENS NÃO LIDAS                      |")
                 print("\n================================================================")
 
-                cur.execute(f"SELECT cliente_mensagem.mensagem_id, corpo FROM cliente_mensagem, mensagem, leitura WHERE cliente_mensagem.cliente_utilizador_id = {utilizador_atual} AND cliente_mensagem.mensagem_id = mensagem.id AND leitura.lida IS NULL ORDER BY mensagem_id ASC;")
+                cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo FROM mensagem, leitura WHERE leitura.lida IS NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
                 corpo = cur.fetchone()
                 if corpo is not None:
                     id_mensagem = corpo[0]

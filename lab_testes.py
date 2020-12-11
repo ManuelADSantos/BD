@@ -22,31 +22,32 @@ cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo, administrador_utilizad
 dados = cur.fetchall()
 print(dados)
 print(len(dados))
-print(dados[0])
-print(dados[0][0])
-print(dados[0][1])
-print(dados[0][2])
+for i in range(len(dados)):
+    print(dados[i])
+    print(dados[i][0])  #ID MENSAGEM
+    print(dados[i][1])  #CORPO
+    print(dados[i][2])  #ID ADMIN
 
-#ID da mensagem
-id_mensagem = dados[ind][0]
-
-#Corpo da mensagem
-if len(dados[ind][1]) > 15:
-    corpo = ""
-    for i in range(12):
-        corpo += dados[ind][1][1]
-    corpo += "  [...]"
-else:
-    corpo = dados[ind][1]
-
-#Administrador que enviou a mensagem
-admin_id = dados[ind][2]
-cur.execute(f"SELECT nome FROM utilizador WHERE id = {admin_id}")
-admin = cur.fetchone()[0]
-
-#Mostrar resulado
-print(f"ID: {id_mensagem} |Remetente: {admin} |Corpo: {corpo}")
-dados = cur.fetchone()
+# #ID da mensagem
+# id_mensagem = dados[ind][0]
+#
+# #Corpo da mensagem
+# if len(dados[ind][1]) > 15:
+#     corpo = ""
+#     for i in range(12):
+#         corpo += dados[ind][1][1]
+#     corpo += "  [...]"
+# else:
+#     corpo = dados[ind][1]
+#
+# #Administrador que enviou a mensagem
+# admin_id = dados[ind][2]
+# cur.execute(f"SELECT nome FROM utilizador WHERE id = {admin_id}")
+# admin = cur.fetchone()[0]
+#
+# #Mostrar resulado
+# print(f"ID: {id_mensagem} |Remetente: {admin} |Corpo: {corpo}")
+# dados = cur.fetchone()
 #==========================================================================================================================
 # Fecha a ligação à base de dados
 cur.close()

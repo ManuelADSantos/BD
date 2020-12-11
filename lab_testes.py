@@ -18,16 +18,18 @@ utilizador_atual = 2    #Utilizador com login efetuado
 
 #Registar mensagem na tabela leitura
 
-id_mensagem = 1
-cur.execute("SELECT utilizador_id FROM cliente")
-print("CHECK 3")
-for linha in cur.fetchall():
-    utilizador_id = linha[0]
-    #cur.execute(f"INSERT INTO cliente_mensagem(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {utilizador_id});")
-    cur.execute(f"INSERT INTO leitura(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {utilizador_id});")
-    print("CHECK 4")
-    print(utilizador_id)
-conn.commit()
+cur.execute("SELECT artigo.titulo, '|nº vezes alugado: ', count(*) as total from artigo join aluguer on artigo.id = aluguer.artigo_id where aluguer.ativo = True GROUP by artigo.titulo order by total DESC LIMIT 10;")
+
+print("TOP 10 - Artigo atualmente mais alugado:")
+artigoalugado = cur.fetchone()
+
+if artigoalugado is None:
+    print("Resultado não encontrado!")
+
+while artigoalugado is not None:
+    print("->", *artigoalugado)
+    artigoalugado = cur.fetchone()
+
 
 #==========================================================================================================================
 # Fecha a ligação à base de dados

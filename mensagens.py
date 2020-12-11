@@ -205,6 +205,7 @@ def cliente_mensagens():
                     while True:
                         opcao = input("\n\t\t ||   1 - PRÓXIMA MENSAGEM   ||\n\t\t || v/V - VOLTAR A MENSAGENS ||\n\t\t\t       ")
                         if opcao == "1" or opcao == "v" or opcao == "V":
+                            print("\n\t\t   || A VOLTAR A MENSAGENS ||")
                             break
 
                     if opcao == "1":
@@ -226,11 +227,12 @@ def cliente_mensagens():
                 print("\n================================================================")
 
                 cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo, administrador_utilizador_id FROM mensagem, leitura, mensagem_administrador WHERE leitura.lida IS NOT NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
-                dados = cur.fetchone()
+                dados = cur.fetchall()
                 if dados is not None:
                     while dados is not None:
                         #ID da mensagem
                         id_mensagem = dados[0]
+
                         #Corpo da mensagem
                         if len(dados[1]) > 15:
                             corpo = ""
@@ -246,7 +248,7 @@ def cliente_mensagens():
                         admin = cur.fetchone()[0]
 
                         print(f"ID: {id_mensagem} |Remetente: {admin} |Corpo: {corpo}")
-                        dados = cur.fetchone()
+
 
                     break
 

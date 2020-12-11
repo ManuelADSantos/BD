@@ -123,9 +123,20 @@ def inventario():
                         else:
                             while detalhes is not None:
                                 print("\nDetalhes do artigo: ")
-                                print("[ Título | Tipo | Realizador | Produtor | Ano | Ator ]")
+                                print("[ Título | Tipo | Realizador | Produtor | Ano ]")
                                 print(detalhes)
                                 detalhes = cur.fetchone()
+
+                            try:
+                                cur.execute(f"SELECT nome FROM atores, artigo_atores WHERE atores.id = artigo_atores.atores_id and artigo_id = {artdet};")
+                                nomes = fetchone()
+                                print(f"Atores -> ")
+                                while nomes is not None:
+                                    print(" ")
+                                    nomes = fetchone()
+                            except:
+                                print("Atores -> N/A")
+
 
                             print("\n Mais detalhes: \n")
                             while True:

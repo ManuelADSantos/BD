@@ -5,6 +5,7 @@ from getpass import getpass
 import os
 import datetime
 from datetime import date
+from dateutil.relativedelta import relativedelta
 
 #==========================================================================================================================
 # Estabelecer ligação à base de dados
@@ -15,7 +16,8 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 #==========================================================================================================================
 #Variáveis globais
-utilizador_atual = 0    #Utilizador com login efetuado
+utilizador_atual = 0            #ID Utilizador com login efetuado
+nome_utilizador_atual = ""      #NOME Utilizador com login efetuado
 
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #                                                             ECRÃ INICIAL
@@ -25,7 +27,10 @@ def inicio():
     atualizar_aluguer()
     while True:
         try:
-            print("""\n----------------------------Início--------------------------------
+            print("\n================================================================")
+            print("\n|                           INÍCIO                              |")
+            print("\n================================================================")
+            print("""
                          ____      __
                         |    \    |  |
                         |     \   |  |
@@ -35,14 +40,13 @@ def inicio():
                         |  |   \     |
                         |__|    \____|
                 """)
-            print("""\n\t\t     Bem vind@ ao NETFLOX\n
+            print("""\n\t\t  || Bem vind@ ao NETFLOX ||\n
                           1 - Login\n
                         2 - Registar\n
-                          3 - Sair\n\n
-                          ESCOLHA""")
+                          3 - Sair""")
 
             #Escolha da ação a tomar
-            inicio_escolha = int(input("\n\t\t\t     "))
+            inicio_escolha = int(input("\n\t\t\t      "))
             if (inicio_escolha == 1):       #Login
                 login()
                 #Diferenciar entre admin e cliente
@@ -67,7 +71,9 @@ def inicio():
 #==========================================================================================================================
 #Login
 def login():
-    print("\n----------------------------Login--------------------------------")
+    print("\n================================================================")
+    print("\n|                             LOGIN                            |")
+    print("\n================================================================")
     while True:
         email = input("\n\t\t\t || Email ||\n\t\t ")
         cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
@@ -78,10 +84,12 @@ def login():
                 cur.execute(f"SELECT password FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
                 password_verif = cur.fetchone()
                 if(sha256_crypt.verify(password ,password_verif[0])):
-                    print("\nInicio de sessão bem sucedida\n")
-                    cur.execute(f"SELECT id FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
+                    print("\n\t         Inicio de sessão bem sucedida\n")
+                    cur.execute(f"SELECT id, nome FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
+                    dados = cur.fetchone()
                     global utilizador_atual
-                    utilizador_atual = cur.fetchone()[0]
+                    global nome_utilizador_atual
+                    utilizador_atual, nome_utilizador_atual = dados
                     break
                 else:
                     print(f"\nPassword errada")
@@ -97,31 +105,32 @@ def login():
 def registo():
     while True:
         #Registo do Email
-        print("\n----------------------------Registo--------------------------------")
+        print("\n================================================================")
+        print("\n|                            REGISTO                            |")
+        print("\n================================================================")
         while True:
-            email = input("\nInsira o seu endereço de email\n    ")
+            email = input("\n\t\t|| Insira o seu endereço de email ||\n\t\t   ")
             cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
             email_verif = cur.fetchone()
             if ("@" in email and email_verif[0]==0 and ' ' not in email and email[0]!= '@' and email[len(email)-1]!='@' and '.' in email):
-                print(f"Email inserido\n    {email}")
+                print("\n\t\t      Endereço de email válido")
                 break
             else:
-                print("\nEndereço de email inválido")
+                print("\n\t           Endereço de email inválido")
 
         #Registo da Password
         while(True):
-            password = getpass("\n\nInsira a sua password\n    ")
+            password = getpass("\n\n\t\t    || Insira a sua password ||\n\t\t\t    ")
             password_encriptada = sha256_crypt.hash(password)
-            password_verif = getpass("Confirme a sua password\n    ")
+            password_verif = getpass("\t\t   || Confirme a sua password ||\n\t\t\t      ")
             if(sha256_crypt.verify(password_verif ,password_encriptada)):
-                print("Password aceite\n")
+                print("\t                 Password aceite\n")
                 break
             else:
-                print("Passwords não correspondem")
+                print("\n\t            Passwords não correspondem")
 
         #Registo do nome
-        nickname = input("\n\nInsira o seu nome\n    ")
-        print(f"Nome inserido\n    {nickname}")
+        nickname = input("\n\n\t\t     || Insira o seu nome ||\n\t\t       ")
 
         #Guardar dados na base de dados
         try:
@@ -131,11 +140,11 @@ def registo():
             #Confirmar mudanças
             conn.commit()
             #De volta ao início
-            print("BEM VIND@ À FAMÍLIA NETFLOX")
+            print("\n\t\t|| BEM VIND@ À FAMÍLIA NETFLOX ||")
             return
         except:
             conn.rollback()
-            print("Dados não válidos")
+            print("ERRO NO REGISTO")
 
 
 #==========================================================================================================================
@@ -165,39 +174,43 @@ def atualizar_aluguer():
 def menu_cliente():
     atualizar_aluguer()
     while True:
-        print("\n-------------------------------------MENU CLIENTE-----------------------------------------------\n")
+        print("\n================================================================")
+        print("\n|                         MENU CLIENTE                          |")
+        print("\n================================================================")
+        print(f"\n\t        O que deseja fazer {nome_utilizador_atual}?")
+
 
         escolha_cliente = input("""
-                              1 - Ver Saldo
-                              2 - Pesquisa
-                              3 - Mensagens
-                              4 - Dados sobre Alugueres
-                              5 - Catálogo Completo
-                              6 - Alugar
-                              V|v- Logout
+                         1 - Catálogo
+                         2 - Pesquisa
+                          3 - Alugar
+                      4 - Meus Alugueres
+                          5 - Saldo
+                        6 - Mensagens
+                         V|v- Logout
 
-        Ver: """)
+                               """)
 
         if escolha_cliente == "1":
-            saldos_cliente()
+            lista_cliente()
 
         if escolha_cliente == "2":
             pesquisar_clientes()
 
         if escolha_cliente == "3":
-            mensagens_cliente()
+            alugar_cliente()
 
         if escolha_cliente == "4":
             alugueres_cliente()
 
         if escolha_cliente == "5":
-            lista_cliente()
+            saldos_cliente()
 
         if escolha_cliente == "6":
-            alugar_cliente()
+            mensagens_cliente()
 
         elif escolha_cliente == "V" or escolha_cliente == "v":
-            print("LOGOUT")
+            print("\n\t\t         || LOGOUT ||")
             return
 
 
@@ -209,7 +222,10 @@ def saldos_cliente():
     #PEDE AO CLIENTE QUE TIPO DE PESQUISA QUER EFETUAR
     while True:
 
-        print("----------------------MENU SALDO---------------------\n")
+        print("\n================================================================")
+        print("\n|                            SALDO                             |")
+        print("\n================================================================")
+        print(f"\n\t      {nome_utilizador_atual}, o seu saldo atual é de ")
 
         cur.execute(f"SELECT saldo FROM cliente WHERE utilizador_id = '{utilizador_atual}';")
 
@@ -219,18 +235,17 @@ def saldos_cliente():
             print("Resultado não encontrado!")
 
         while s1 is not None:
-            print("\t\t    Saldo ->", *s1, '€')
+            print("\t\t\t   ", *s1, '€')
             s1 = cur.fetchone()
 
-        s = input("\n\t\t      V|v - Voltar\n\t\t\t   ")
+        s = input("\n\t\t         V|v - Voltar\n\t\t\t       ")
 
         #Volta ao menu anterior
         if s == "V" or s == "v":
             return
 
         else:
-            print("Inválido\nTente outra vez")
-
+            print("")
 
 
 #==========================================================================================================================
@@ -365,15 +380,17 @@ def pesquisar_clientes():
 
     #PEDE AO CLIENTE QUE TIPO DE PESQUISA QUER EFETUAR
     while pesquisarmenu:
-        print("----------------------MENU PESQUISA---------------------")
-        print("\n Onde pretende pesquisar? \n")
+        print("\n================================================================")
+        print("\n|                          PESQUISA                            |")
+        print("\n================================================================")
+        print(f"\n\t     O que deseja pesquisar {nome_utilizador_atual}?")
 
         pesquisar = input("""
-                            1 - Pesquisa a todos os artigos do Sistema
-                            2 - Pesquisa Artigos Alugados
-                            V|v - Voltar MENU CLIENTE
+         1 - Pesquisa a todos os artigos do Sistema
+               2 - Pesquisa a artigos alugados
+                   V|v - Voltar atrás
 
-        Resposta: """)
+                           """)
 
         # 1 - Pesquisa a todos os artigos do Sistema -> Funcao pesquisa_geral
         if pesquisar == "1":
@@ -385,11 +402,11 @@ def pesquisar_clientes():
 
         #Volta ao menu anterior
         elif pesquisar == "V" or pesquisar == "v":
+
             pesquisarmenu = False
 
         else:
-            print("Inválido")
-            print("Tenta outra vez")
+            print("")
 
 
 # -----------------------------------------------Pesquisa a todos os artigos do sistema------------------------------------
@@ -398,19 +415,20 @@ def pesquisa_geral():
     ordenar = False
     # Pergunta ao cliente que tipo de pesquisa quer fazer
     while pesquisageral:
-        print(
-            "-------------------------------Pesquisa a todos os artigos do sistema:-----------------------------------------------")
-        print("\n Como pretende pesquisar? \n")
+        print("\n================================================================")
+        print("\n|                    PESQUISA GERAL                            |")
+        print("\n================================================================")
+        print(f"\n            Como pretende pesquisar {nome_utilizador_atual}? \n")
         pesquisa = input("""
-                                  1 - Tipo
-                                  2 - Titulo
-                                  3 - Ator
-                                  4 - Realizador
-                                  5 - Produtor
-                                  6 - Ano
-                                  V|v - Voltar MENU PESQUISA
+                        1 - Tipo
+                        2 - Titulo
+                        3 - Ator
+                        4 - Realizador
+                        5 - Produtor
+                        6 - Ano
+                V|v - Voltar MENU PESQUISA
 
-            Pesquisa por: """)
+                            """)
 
         if pesquisa == "V" or pesquisa == "v":
             print("\n Voltar ao MENU PESQUISA")
@@ -431,10 +449,11 @@ def pesquisa_geral():
             while True:
                 try:
 
-                    ordem = int(input(""" Ordenação dos resultados:
-                                           1 - ordem crescente
-                                           2 - ordem decrescente
-                     ORDEM(1|2): """))
+                    ordem = int(input("""\n                   Ordenar resultados por
+                    1 - ordem crescente
+                    2 - ordem decrescente
+
+                             """))
 
                     if ordem != 1 and ordem != 2:
                         raise ValueError("ERRO")
@@ -454,120 +473,122 @@ def pesquisa_geral():
         # --------------------------------------------PESQUISA POR TIPO-------------------------------------------------
         if pesquisa == "1":
 
-            titulo1 = input("Pesquisa por tipo : \n")
+            titulo1 = input("\t\t  || Pesquisa por tipo || \n\t\t\t")
 
             cur.execute(f"SELECT titulo from artigo where tipo like '%{titulo1}' ORDER by titulo {ordem};")
-
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
 
             p_tipo = cur.fetchone()
 
             if p_tipo is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
 
-            while p_tipo is not None:
-                print("-> ", *p_tipo)
-                p_tipo = cur.fetchone()
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
+
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+                while p_tipo is not None:
+                    print("-> ", *p_tipo)
+                    p_tipo = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR TITULO-------------------------------------------------
         elif pesquisa == "2":
 
-            titulo2 = input("Pesquisa por título: \n")
+            titulo2 = input("\t\t  || Pesquisa por titulo || \n\t\t\t")
 
             cur.execute(f"SELECT titulo FROM artigo WHERE titulo like '%{titulo2}' ORDER by titulo {ordem};")
-
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
 
             p_titulo = cur.fetchone()
 
             if p_titulo is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_titulo is not None:
-                print("->", *p_titulo)
-                p_titulo = cur.fetchone()
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+
+                while p_titulo is not None:
+                    print("->", *p_titulo)
+                    p_titulo = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR ATOR--------------------------------------------------
         elif pesquisa == "3":
 
-            titulo3 = input("Pesquisa por Ator: \n")
+            titulo3 = input("\t\t  || Pesquisa por ator || \n\t\t\t")
 
             cur.execute(
                 f"SELECT artigo.titulo from artigo join artigo_atores on artigo.id = artigo_atores.artigo_id join atores on atores.id= artigo_atores.atores_id where atores.nome like '%{titulo3}' ORDER BY titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
-
             p_atores = cur.fetchone()
 
             if p_atores is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
 
-            while p_atores is not None:
-                print("->", *p_atores)
-                p_atores = cur.fetchone()
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
+
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+
+                while p_atores is not None:
+                    print("->", *p_atores)
+                    p_atores = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR REALIZADOR-------------------------------------------------
         elif pesquisa == "4":
 
-            titulo4 = input("Pesquisa por realizador: \n")
+            titulo4 = input("\t\t  || Pesquisa por realizador || \n\t\t\t")
 
             cur.execute(f"SELECT titulo from artigo where realizador like '%{titulo4}' ORDER by titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
 
             p_realizador = cur.fetchone()
 
             if p_realizador is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
 
-            while p_realizador is not None:
-                print("->", *p_realizador)
-                p_realizador = cur.fetchone()
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
+
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+                while p_realizador is not None:
+                    print("->", *p_realizador)
+                    p_realizador = cur.fetchone()
 
 
         # --------------------------------------------PESQUISA POR PRODUTOR-------------------------------------------------
         elif pesquisa == "5":
 
-            titulo5 = input("Pesquisa por produtor: \n")
+            titulo5 = input("\t\t  || Pesquisa por produtor || \n\t\t\t")
 
             cur.execute(f"SELECT titulo from artigo where produtor like '%{titulo5}' ORDER by titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
             p_produtor = cur.fetchone()
 
             if p_produtor is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_produtor is not None:
-                print("->", *p_produtor)
-                p_produtor = cur.fetchone()
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+                while p_produtor is not None:
+                    print("->", *p_produtor)
+                    p_produtor = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR ANO-------------------------------------------------
         elif pesquisa == "6":
 
             while True:
                 try:
-                    titulo6 = int(input("Pesquisa por Ano: \n"))
+                    titulo6 = int(input("\t\t  || Pesquisa por ano || \n\t\t\t"))
                     # a primeira exibição de um filme de curta duração aconteceu no Salão Grand Café, em Paris, em 28 de dezembro de 1895
                     if titulo6 < 1895 or titulo6>=2021:
                         raise ValueError("INSIRA UM ANO VÁLIDO!")
@@ -579,21 +600,20 @@ def pesquisa_geral():
 
             cur.execute(f"SELECT titulo from artigo where ano = '{titulo6}' ORDER by titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
-
             p_ano = cur.fetchone()
 
             if p_ano is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_ano is not None:
-                print("->", *p_ano)
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
 
-                p_ano = cur.fetchone()
+                while p_ano is not None:
+                    print("->", *p_ano)
+                    p_ano = cur.fetchone()
     return
 
 # -------------------------------------Pesquisa aos artigos neste momento alugados pelo cliente----------------------------
@@ -606,19 +626,21 @@ def pesquisa_user():
     # Pergunta ao cliente que tipo de pesquisa quer fazer
     while pesquisauser:
 
-        print(
-            "-------------------------------Pesquisa aos artigos neste momento alugados:-----------------------------------------------")
-        print("\n Como pretende pesquisar? \n")
+        print("\n================================================================")
+        print("\n|               PESQUISA ARTIGOS ALUGADOS                       |")
+        print("\n================================================================")
+        print(f"\n            Como pretende pesquisar {nome_utilizador_atual}? \n")
 
         pesquisa = input("""
-                                  1 - Tipo
-                                  2 - Titulo
-                                  3 - Ator
-                                  4 - Realizador
-                                  5 - Produtor
-                                  6 - Ano
-                                  V|v - Voltar MENU PESQUISA
-            Pesquisa por: """)
+                        1 - Tipo
+                        2 - Titulo
+                        3 - Ator
+                        4 - Realizador
+                        5 - Produtor
+                        6 - Ano
+                V|v - Voltar MENU PESQUISA
+
+                            """)
 
         if pesquisa == "V" or pesquisa == "v":
             print("\n Voltar ao MENU PESQUISA")
@@ -632,18 +654,21 @@ def pesquisa_user():
             ordenar = False
             print("\n Inválido! \n Tenta outra vez")
 
+
         # especificar critérios de ordenação dos resultados
         if ordenar == True:
+
             while True:
                 try:
-                    ordem = int(input("""Ordenação dos resultados:
-                                        1 - ordem crescente
-                                        2 - ordem decrescente
-                     ORDEM(1 | 2): """))
+
+                    ordem = int(input("""\n                   Ordenar resultados por
+                    1 - ordem crescente
+                    2 - ordem decrescente
+
+                             """))
 
                     if ordem != 1 and ordem != 2:
                         raise ValueError("ERRO")
-
                 except ValueError:
                     print("ERRO")
                     continue
@@ -660,124 +685,125 @@ def pesquisa_user():
         # --------------------------------------------PESQUISA POR TIPO-------------------------------------------------
         if pesquisa == "1":
 
-            titulo1 = input("Pesquisa por tipo: \n")
+            titulo1 = input("\t\t  || Pesquisa por tipo || \n\t\t\t")
 
-            cur.execute(
-                f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where artigo.tipo like '%{titulo1}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}'ORDER by titulo {ordem};")
+            cur.execute(f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where artigo.tipo like '%{titulo1}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}'ORDER by titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
 
             p_tipo = cur.fetchone()
 
             if p_tipo is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_tipo is not None:
-                print("->", *p_tipo)
-                p_tipo = cur.fetchone()
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+                while p_tipo is not None:
+                    print("->", *p_tipo)
+                    p_tipo = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR TITULO-------------------------------------------------
         elif pesquisa == "2":
 
-            titulo2 = input("Pesquisa por título: \n")
+            titulo2 = input("\t\t  || Pesquisa por titulo || \n\t\t\t")
 
             cur.execute(
                 f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where artigo.titulo like '%{titulo2}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}'ORDER by titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
 
             p_titulo = cur.fetchone()
 
             if p_titulo is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_titulo is not None:
-                print("->", *p_titulo)
-                p_titulo = cur.fetchone()
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+                while p_titulo is not None:
+                    print("->", *p_titulo)
+                    p_titulo = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR ATOR-------------------------------------------------
         elif pesquisa == "3":
 
-            titulo3 = input("Pesquisa por Ator: \n")
+            titulo3 = input("\t\t  || Pesquisa por ator || \n\t\t\t")
 
             cur.execute(
                 f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id join artigo_atores on artigo.id = artigo_atores.artigo_id join atores on atores.id= artigo_atores.atores_id where atores.nome like '%{titulo3}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}' ORDER BY titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
 
             p_atores = cur.fetchone()
 
             if p_atores is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_atores is not None:
-                print("->", *p_atores)
-                p_atores = cur.fetchone()
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+
+                while p_atores is not None:
+                    print("->", *p_atores)
+                    p_atores = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR REALIZADOR-------------------------------------------------
         elif pesquisa == "4":
 
-            titulo4 = input("Pesquisa por realizador: \n")
+            titulo4 = input("\t\t  || Pesquisa por realizador || \n\t\t\t")
 
             cur.execute(
                 f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where artigo.realizador like '%{titulo4}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}'ORDER by titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
 
             p_realizador = cur.fetchone()
 
             if p_realizador is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_realizador is not None:
-                print("->", *p_realizador)
-                p_realizador = cur.fetchone()
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+                while p_realizador is not None:
+                    print("->", *p_realizador)
+                    p_realizador = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR PRODUTOR-------------------------------------------------
         elif pesquisa == "5":
 
-            titulo5 = input("Pesquisa por produtor: \n")
+            titulo5 = input("\t\t  || Pesquisa por produtor || \n\t\t\t")
 
             cur.execute(
                 f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where artigo.produtor like '%{titulo5}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}'ORDER by titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
 
             p_produtor = cur.fetchone()
 
             if p_produtor is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_produtor is not None:
-                print("->", *p_produtor)
-                p_produtor = cur.fetchone()
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+
+                while p_produtor is not None:
+                    print("->", *p_produtor)
+                    p_produtor = cur.fetchone()
 
         # --------------------------------------------PESQUISA POR ANO-------------------------------------------------
         elif pesquisa == "6":
 
             while True:
                 try:
-                    titulo6 = int(input("Pesquisa por Ano: \n"))
+                    titulo6 = int(input("\t\t  || Pesquisa por ano || \n\t\t\t"))
                     # a primeira exibição de um filme de curta duração aconteceu no Salão Grand Café, em Paris, em 28 de dezembro de 1895
                     if titulo6 < 1895 or titulo6 >= 2021:
                         raise ValueError("INSIRA UM ANO VÁLIDO!")
@@ -790,31 +816,33 @@ def pesquisa_user():
             cur.execute(
                 f"SELECT artigo.titulo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where artigo.ano = '{titulo6}' and aluguer.ativo = True and cliente.utilizador_id = '{cliente_atual}'ORDER by titulo {ordem};")
 
-            if ordem == "ASC":
-                print("Título (ordem crescente):")
-
-            elif ordem == "DESC":
-                print("Título (ordem decrescente):")
-
             p_ano = cur.fetchone()
 
             if p_ano is None:
-                print("Resultado não encontrado!")
+                print("\n\t\tResultado não encontrado!")
+            else:
+                if ordem == "ASC":
+                    print("\nTítulo (ordem crescente):")
 
-            while p_ano is not None:
-                print("->", *p_ano)
-                p_ano = cur.fetchone()
+                elif ordem == "DESC":
+                    print("\nTítulo (ordem decrescente):")
+
+                while p_ano is not None:
+                    print("->", *p_ano)
+                    p_ano = cur.fetchone()
 
     return
 
-
 # -------------------------------------Lista de Alugueres----------------------------
 def alugueres_cliente():
-    print("-------------------------------------------DADOS SOBRE OS ALUGUERES------------------------------------------")
+    print("\n================================================================")
+    print("\n|               DADOS SOBRE OS MEUS ALUGADOS                    |")
+    print("\n================================================================")
+    print(f"\n                   Dados de {nome_utilizador_atual} \n")
 
     cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, artigo.tipo, aluguer.preco_aluguer from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}'and aluguer.ativo = True ORDER by aluguer.data DESC;")
 
-    print("\n......................Ativos.......................")
+    print("\n                   || Alugueres Ativos ||\n")
     for linha in cur.fetchall():
         titulo, periodo_de_aluguer, data, tipo, preco = linha
         print("Título: ", titulo, " | Tipo: ", tipo," | Data de aluguer: ", data.strftime("%d/%m/%Y %H:%M"), "| Periodo de Aluguer: ", periodo_de_aluguer, " meses | Preço de Aluguer: ", preco, "€")
@@ -822,35 +850,35 @@ def alugueres_cliente():
     cur.execute(
         f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, artigo.tipo, aluguer.preco_aluguer from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}' and aluguer.ativo = False ORDER by aluguer.data DESC;")
 
-    print("\n.....................Não Ativos......................")
+    print("\n\n                  || Alugueres Não Ativos ||\n")
     for linha in cur.fetchall():
         titulo, periodo_de_aluguer, data, tipo, preco = linha
         print("Título: ", titulo, " | Tipo: ", tipo," | Data de aluguer: ", data.strftime("%d/%m/%Y %H:%M"), "| Periodo de Aluguer: ", periodo_de_aluguer, " meses | Preço de Aluguer: ", preco, "€")
 
-    print("\n....................Total gasto em alugueres.................")
+    print("\n\n                || Total Gasto em Alugueres ||")
     cur.execute(f"SELECT coalesce(sum(preco_aluguer), 0) from aluguer where cliente_utilizador_id = {utilizador_atual};")
     p = cur.fetchone()
-    print("Total:", *p, " €")
+    print("\n\t\t\t    ", *p, " €")
 
-    print("\n....................Total gasto em Documentários alugados.................")
+    print("\n\n          || Total Gasto em Aluguer de Documentários ||")
     cur.execute(f"SELECT coalesce(sum(preco_aluguer), 0) from aluguer join artigo on aluguer.artigo_id = artigo.id where artigo.tipo like '%documentario%' and cliente_utilizador_id = {utilizador_atual};")
     p1 = cur.fetchone()
-    print("Documentários:", *p1, " €")
+    print("\n\t\t\t    ", *p1, " €")
 
-    print("\n....................Total gasto em Filmes alugados.................")
+    print("\n\n             || Total Gasto em Aluguer de Filmes ||")
     cur.execute(f"SELECT coalesce(sum(preco_aluguer), 0) from aluguer join artigo on aluguer.artigo_id = artigo.id where artigo.tipo like '%filme%' and cliente_utilizador_id = {utilizador_atual};")
     p2 = cur.fetchone()
-    print("Filmes:", *p2, " €")
+    print("\n\t\t\t    ", *p2, " €")
 
-    print("\n....................Total gasto em Séries alugadas.................")
+    print("\n\n             || Total Gasto em Aluguer de Séries ||")
     cur.execute(f"SELECT coalesce(sum(preco_aluguer), 0) from aluguer join artigo on aluguer.artigo_id = artigo.id where artigo.tipo like '%serie%' and cliente_utilizador_id = {utilizador_atual};")
     p3 = cur.fetchone()
-    print("Séries:", *p3, " €")
+    print("\n\t\t\t    ", *p3, " €")
 
 
-    print("\n\t\t\t\tv/V - Voltar ao Menu Cliente")
+    print("\n\n\t\t v/V - Voltar ao Menu Cliente")
     while True:
-        voltar = input("\t\t\t\t\t       ")
+        voltar = input("\t\t\t\t")
         if voltar == "v" or voltar == "V":
             break
     return
@@ -859,7 +887,10 @@ def alugueres_cliente():
 #-------------------------------------Catálogo/ Lista de todos os artigos-------------------------------------------------
 def lista_cliente():
     while True:
-        print("---------------------------------CATÁLOGO DE ARTIGOS----------------------------------------")
+        print("\n================================================================")
+        print("\n|                         CATÁLOGO                             |")
+        print("\n================================================================")
+        print(f"\n            Aqui pode ver todos os nossos artigos {nome_utilizador_atual}\n")
 
         cur.execute("SELECT id, titulo, tipo from artigo ORDER BY tipo ASC, titulo ASC;")
 
@@ -867,7 +898,7 @@ def lista_cliente():
             id, titulo, tipo = linha
             print("Título: ", titulo, "| Tipo: ", tipo, "| ID: ", id)
 
-        det = input("\n\t\t\t\t\tV|v - Voltar\n\n\t\t\t\t\t    ")
+        det = input("\n\t\t\tV|v - Voltar\n\n\t\t\t\t\t    ")
 
         # Volta ao Inventário
         if det == "V" or det == "v":
@@ -882,13 +913,16 @@ def lista_cliente():
 #----------------------------------------Alugar artigos----------------------------------------------------
 def alugar_cliente():
     while True:
-        print("---------------------------------ARTIGOS PARA ALUGAR----------------------------------------")
+        print("\n================================================================")
+        print("\n|                      ALUGAR ARTIGOS                          |")
+        print("\n================================================================")
+        print(f"\n                    O que deseja alugar {nome_utilizador_atual}?\n")
         cur.execute(f"SELECT id, titulo, tipo FROM artigo EXCEPT SELECT artigo.id, titulo, tipo FROM artigo, aluguer WHERE artigo.id = aluguer.artigo_id AND ativo = true AND aluguer.cliente_utilizador_id = {utilizador_atual};")
         for linha in cur.fetchall():
             id, titulo, tipo = linha
             print("Título: ", titulo, "| Tipo: ", tipo, "| ID: ", id)
 
-        artdet = input("\n\t\t\t         ID - Artigo a alugar\n\t\t\t         v/V - Voltar ao Menu\n\t\t\t\t       ")
+        artdet = input("\n\t           ID - Artigo a alugar\n\t           v/V - Voltar ao Menu\n\t\t            ")
 
         if (artdet == "v" or artdet == "V"):
             print("De volta ao MENU")
@@ -902,7 +936,7 @@ def alugar_cliente():
                 if detalhes is None:
                     print(f"Não existe um artigo com o ID {artdet}")
                 else:
-                    print("\nDetalhes do artigo: ")
+                    print("\n\n\t\t  || Detalhes do artigo ||\n")
                     print(
                         f"Título: {detalhes[0]} | Tipo: {detalhes[1]} | Realizador: {detalhes[2]} | Produtor: {detalhes[3]} | Ano: {detalhes[4]} ")
 
@@ -919,7 +953,7 @@ def alugar_cliente():
                     except:
                         print("Atores : N/A")
 
-                    print("\n----------------------------Condições de aluguer--------------------------------------\n")
+                    print("\n\t\t || Condições de aluguer ||\n")
 
                     cur.execute(f"SELECT periodo_de_aluguer, preco from artigo, historico_precos where artigo.id = {artdet} and historico_precos.atual = True and historico_precos.artigo_id = {artdet};")
 
@@ -929,16 +963,15 @@ def alugar_cliente():
 
                     while True:
 
-                        det1 = input("""Pretende ALUGAR?
-
-                        Responda (S|N): """)
+                        det1 = input("""\n\n\t\t    Pretende ALUGAR(S|N)?
+                            """)
 
                         if det1 == "S" or det1 == "s":
                             cur.execute(f"SELECT saldo FROM cliente WHERE utilizador_id = {utilizador_atual}")
                             saldo_atual = cur.fetchone()[0]
 
                             if saldo_atual < preco:
-                                print("\nSALDO INSUFICIENTE PARA ALUGAR ESTE ARTIGO")
+                                print("\n          SALDO INSUFICIENTE PARA ALUGAR ESTE ARTIGO")
                                 break
                             else:
                                 try:
@@ -1828,7 +1861,7 @@ def alterarsaldo_admin():
 #                                                                INÍCIO
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #Iniciar programa
-inicio()
+alugar_cliente()
 
 
 #==========================================================================================================================

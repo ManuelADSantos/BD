@@ -22,6 +22,7 @@ utilizador_atual = 0    #Utilizador com login efetuado
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #Início/Ecrã inicial
 def inicio():
+    atualizar_aluguer()
     while True:
         try:
             print("""\n----------------------------Início--------------------------------
@@ -137,12 +138,32 @@ def registo():
             print("Dados não válidos")
 
 
+#==========================================================================================================================
+#Atualizar validade dos alugueres
+def atualizar_aluguer():
+    cur.execute(f"SELECT data, aluguer.id , periodo_de_aluguer FROM aluguer, artigo WHERE aluguer.artigo_id = artigo.id AND aluguer.ativo = true")
+    for linha in cur.fetchall():
+        data = linha[0]
+        id = linha[1]
+        periodo_de_aluguer = linha[2]
+        validade = data + relativedelta(months =+ periodo_de_aluguer)
+        if(date.today() > validade.date()):
+            try:
+                cur.execute(f"UPDATE aluguer SET ativo = false WHERE id = id")
+                conn.commit()
+            except:
+                conn.rollback()
+
+    return
+
+
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #                                                               CLIENTE
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #==========================================================================================================================
 #Menu CLIENTE
 def menu_cliente():
+    atualizar_aluguer()
     while True:
         print("\n-------------------------------------MENU CLIENTE-----------------------------------------------\n")
 
@@ -945,6 +966,7 @@ def alugar_cliente():
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #Menu ADMIN
 def menu_admin():
+    atualizar_aluguer()
     while True:
         print("\n-------------------------------------MENU ADMIN-----------------------------------------------\n")
 

@@ -68,8 +68,7 @@ def lista():
                             print("Valor de ID inválido")
 
                     try:
-                        cur.execute(
-                            f"SELECT titulo, tipo, realizador, produtor, ano from artigo where id = '{artdet}';")
+                        cur.execute(f"SELECT titulo, tipo, realizador, produtor, ano from artigo where id = '{artdet}';")
                         detalhes = cur.fetchone()
                         if detalhes is None:
                             print(f"Não existe um artigo com o ID {artdet}")

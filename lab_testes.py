@@ -24,8 +24,14 @@ def alugar():
             id, titulo, tipo = linha
             print("Título: ", titulo, "| Tipo: ", tipo, "| ID: ", id)
 
+        artdet = input("\n\t\t\t         ID - Artigo a alugar\n\t\t\t         v/V - Voltar ao Menu\n\t\t\t\t       ")
+
+        if (artdet == "v" or artdet == "V"):
+            print("De volta ao MENU")
+            break
+
         try:
-            artdet = int(input("Que artigo quer alugar?(ID): "));
+            artdet = int(artdet)
             try:
                 cur.execute(f"SELECT titulo, tipo, realizador, produtor, ano from artigo where id = '{artdet}';")
                 detalhes = cur.fetchone()
@@ -37,8 +43,7 @@ def alugar():
                         f"Título: {detalhes[0]} | Tipo: {detalhes[1]} | Realizador: {detalhes[2]} | Produtor: {detalhes[3]} | Ano: {detalhes[4]} ")
 
                     try:
-                        cur.execute(
-                            f"SELECT nome FROM atores, artigo_atores WHERE atores.id = artigo_atores.atores_id and artigo_id = {artdet};")
+                        cur.execute(f"SELECT nome FROM atores, artigo_atores WHERE atores.id = artigo_atores.atores_id and artigo_id = {artdet};")
                         nomes = cur.fetchone()
                         if nomes is None:
                             print("Atores : N/A")
@@ -65,23 +70,32 @@ def alugar():
                         Responda (S|N): """)
 
                         if det1 == "S" or det1 == "s":
+                            cur.execute(f"SELECT saldo FROM cliente WHERE utilizador_id = {utilizador_atual}")
+                            saldo_atual = cur.fetchone()[0]
 
-                            #cur.execute(f"INSERT INTO aluguer (id, data, ativo, artigo_id, cliente_utilizador_id) VALUES (DEFAULT, CURRENT_TIMESTAMP, True, (SELECT id from artigo where id = '{artdet}'), '{utilizador_atual}');")
-
-                            print("\nALUGADO!\n")
-                            
-                            break
+                            if saldo_atual < preco:
+                                print("\nSALDO INSUFICIENTE PARA ALUGAR ESTE ARTIGO")
+                                break
+                            else:
+                                try:
+                                    cur.execute(f"INSERT INTO aluguer (id, data, ativo, artigo_id, cliente_utilizador_id, preco_aluguer) VALUES (DEFAULT, CURRENT_TIMESTAMP, True, {artdet}, {utilizador_atual},{preco});")
+                                    conn.commit()
+                                    print("\nALUGADO!\n")
+                                    break
+                                except:
+                                    conn.rollback()
+                                    print("\nALUGUER CANCELADO!\n")
+                                    break
 
                         elif det1 == "N" or det1 == "n":
                             break
                         else:
                             print("Inválido\nTenta outra vez")
 
-            except ValueError:
+            except:
                 print("ERRO!")
         except ValueError:
-            print("Valor de ID inválido")
-
+            print("VALOR INVÁLIDO")
 
 
 alugar()

@@ -6,6 +6,7 @@ import os
 import datetime
 from datetime import date
 from dateutil.relativedelta import relativedelta
+import stdiomask
 
 #==========================================================================================================================
 # Estabelecer ligação à base de dados
@@ -75,12 +76,12 @@ def login():
     print("\n|                             LOGIN                            |")
     print("\n================================================================")
     while True:
-        email = input("\n\t\t\t || Email ||\n\t\t ")
+        email = input("\n\t\t\t || Email ||\n\t\t    ")
         cur.execute(f"SELECT COUNT(email) FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
         email_verif = cur.fetchone()
         if (email_verif[0]==1):
             while True:
-                password = getpass("\n\t\t        || Password ||\n\t\t\t     ")
+                password = stdiomask.getpass("\n\t\t        || Password ||\n\t\t\t   ")
                 cur.execute(f"SELECT password FROM utilizador WHERE email LIKE '%{email}' AND email LIKE '{email}%'")
                 password_verif = cur.fetchone()
                 if(sha256_crypt.verify(password ,password_verif[0])):
@@ -120,9 +121,9 @@ def registo():
 
         #Registo da Password
         while(True):
-            password = getpass("\n\n\t\t    || Insira a sua password ||\n\t\t\t    ")
+            password = stdiomask.getpass("\n\n\t\t    || Insira a sua password ||\n\t\t\t    ")
             password_encriptada = sha256_crypt.hash(password)
-            password_verif = getpass("\t\t   || Confirme a sua password ||\n\t\t\t      ")
+            password_verif = stdiomask.getpass("\t\t   || Confirme a sua password ||\n\t\t\t      ")
             if(sha256_crypt.verify(password_verif ,password_encriptada)):
                 print("\t                 Password aceite\n")
                 break
@@ -1178,7 +1179,7 @@ def historico(art):
 
             tentativas = 3
             while tentativas > 0:
-                confirmar = getpass("Introduza a sua chave de administrador para confirmar a alteração do preço:\n")
+                confirmar = stdiomask.getpass("Introduza a sua chave de administrador para confirmar a alteração do preço:\n")
                 cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                 chave = cur.fetchone()[0]
                 if confirmar == chave:
@@ -1240,7 +1241,7 @@ def mensagens_admin():
                                 tentativas = 3
                                 sair = False
                                 while tentativas > 0:
-                                    confirmar = getpass("\nIntroduza a sua chave de administrador para confirmar o envio da mensagem:\n")
+                                    confirmar = stdiomask.getpass("\nIntroduza a sua chave de administrador para confirmar o envio da mensagem:\n")
                                     cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                                     chave = cur.fetchone()[0]
                                     if confirmar == chave:
@@ -1320,7 +1321,7 @@ def mensagens_admin():
                                 tentativas = 3
                                 sair = False
                                 while tentativas > 0:
-                                    confirmar = getpass("Introduza a sua chave de administrador para confirmar o envio da mensagem:\n")
+                                    confirmar = stdiomask.getpass("Introduza a sua chave de administrador para confirmar o envio da mensagem:\n")
                                     cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                                     chave = cur.fetchone()[0]
                                     if confirmar == chave:
@@ -1544,7 +1545,7 @@ def adicionarartigo_admin():
 
                 tentativas = 3
                 while tentativas > 0:
-                    confirmar = getpass("\nIntroduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                    confirmar = stdiomask.getpass("\nIntroduza a sua chave de administrador para confirmar a introdução do artigo:\n")
                     cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                     chave = cur.fetchone()[0]
                     if confirmar == chave:
@@ -1563,7 +1564,7 @@ def adicionarartigo_admin():
             elif perguntar == "N" or perguntar == "n":
                 tentativas = 3
                 while tentativas > 0:
-                    confirmar = getpass("\nIntroduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                    confirmar = stdiomask.getpass("\nIntroduza a sua chave de administrador para confirmar a introdução do artigo:\n")
                     cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                     chave = cur.fetchone()[0]
                     if confirmar == chave:
@@ -1626,7 +1627,7 @@ def removerartigo_admin():
 
                         tentativas = 3
                         while tentativas > 0:
-                            confirmar = getpass("Introduza a sua chave de administrador para confirmar a remoção do artigo:\n")
+                            confirmar = stdiomask.getpass("Introduza a sua chave de administrador para confirmar a remoção do artigo:\n")
                             cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                             chave = cur.fetchone()[0]
                             if confirmar == chave:
@@ -1826,7 +1827,7 @@ def alterarsaldo_admin():
                                         saldo_novo = saldo_atual + valor
                                         tentativas = 3
                                         while tentativas > 0:
-                                            confirmar = getpass("Introduza a sua chave de administrador para confirmar a alteração do saldo:\n")
+                                            confirmar = stdiomask.getpass("Introduza a sua chave de administrador para confirmar a alteração do saldo:\n")
                                             cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                                             chave = cur.fetchone()[0]
                                             cur.execute(f"UPDATE cliente SET saldo = {saldo_novo} WHERE utilizador_id = {cliente_escolhido}")

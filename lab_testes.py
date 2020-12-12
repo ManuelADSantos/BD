@@ -16,7 +16,7 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 utilizador_atual = 2    #Utilizador com login efetuado
 #==========================================================================================================================
 
-def alugar():
+def alugar_cliente():
     while True:
         print("---------------------------------ARTIGOS PARA ALUGAR----------------------------------------")
         cur.execute(f"SELECT id, titulo, tipo FROM artigo EXCEPT SELECT artigo.id, titulo, tipo FROM artigo, aluguer WHERE artigo.id = aluguer.artigo_id AND ativo = true AND aluguer.cliente_utilizador_id = {utilizador_atual};")

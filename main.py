@@ -1228,27 +1228,23 @@ def mensagens_admin():
                                 #Inserir mensagem na tabela mensagens
                                 cur.execute(f"INSERT INTO mensagem(id, corpo) VALUES (DEFAULT, '{texto}') RETURNING id;")
                                 id_mensagem = cur.fetchone()[0]
-                                print(f"CHECK 1 {id_mensagem}")
                                 #Registar mensagem na tabela mensagem_administrador
                                 cur.execute(f"INSERT INTO mensagem_administrador(mensagem_id, administrador_utilizador_id) VALUES ({id_mensagem}, {utilizador_atual});")
-                                print("CHECK 2")
                                 #Registar mensagem na tabela cliente_mensagem e leitura
                                 cur.execute("SELECT utilizador_id FROM cliente")
-                                print("CHECK 3")
                                 for linha in cur.fetchall():
                                     utilizador_id = linha[0]
                                     cur.execute(f"INSERT INTO cliente_mensagem(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {utilizador_id});")
                                     cur.execute(f"INSERT INTO leitura(mensagem_id, cliente_utilizador_id) VALUES ({id_mensagem}, {utilizador_id});")
-                                    print("CHECK 4")
 
                                 tentativas = 3
                                 sair = False
                                 while tentativas > 0:
-                                    confirmar = getpass("Introduza a sua chave de administrador para confirmar o envio da mensagem:\n")
+                                    confirmar = getpass("\nIntroduza a sua chave de administrador para confirmar o envio da mensagem:\n")
                                     cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                                     chave = cur.fetchone()[0]
                                     if confirmar == chave:
-                                        print("MENSAGEM GERAL ENVIADA ")
+                                        print("\nMENSAGEM GERAL ENVIADA ")
                                         conn.commit()
                                         sair = True
                                         break
@@ -1371,7 +1367,7 @@ def adicionarartigo_admin():
 
         #Título
         while True:
-            novo_titulo = input("Titulo do novo artigo: ")
+            novo_titulo = input("\nTitulo do novo artigo: ")
             validar = input("\nConfirma o titulo do artigo a introduzir? (S/N)\n")
             if validar == "S" or validar == "s":
                 break
@@ -1382,7 +1378,7 @@ def adicionarartigo_admin():
 
         #Tipo
         while True:
-            novo_tipo = input("Tipo de artigo\n1 - Filme\n2 - Documentário\n3 - Série\n")
+            novo_tipo = input("\nTipo de artigo\n1 - Filme\n2 - Documentário\n3 - Série\n")
             if novo_tipo == "1" or novo_tipo == "2" or novo_tipo == "3":
                 validar = input("Confirma o tipo do artigo a introduzir? (S/N)\n")
                 if validar == "S" or validar == "s":
@@ -1402,7 +1398,7 @@ def adicionarartigo_admin():
 
         #Realizador
         while True:
-            novo_realizador = input("Realizador do novo artigo: ")
+            novo_realizador = input("\nRealizador do novo artigo: ")
             validar = input("\nConfirma o realizador do artigo a introduzir? (S/N)\n")
             if validar == "S" or validar == "s":
                 break
@@ -1413,7 +1409,7 @@ def adicionarartigo_admin():
 
         #Produtor
         while True:
-            novo_produtor = input("Produtor do novo artigo: ")
+            novo_produtor = input("\nProdutor do novo artigo: ")
             validar = input("\nConfirma o produtor do artigo a introduzir? (S/N)\n")
             if validar == "S" or validar == "s":
                 break
@@ -1427,7 +1423,7 @@ def adicionarartigo_admin():
             ano_atual = datetime.datetime.now()
             ano_atual = int(ano_atual.strftime("%Y"))
             try:
-                novo_ano = int(input("Ano do novo artigo: "))
+                novo_ano = int(input("\nAno do novo artigo: "))
 
                 if novo_ano < 1895 or novo_ano > ano_atual:
                     print("Valor não válido")
@@ -1445,7 +1441,7 @@ def adicionarartigo_admin():
         #Periodo de aluguer
         while True:
             try:
-                novo_periodoaluguer = int(input("Especifique o periodo de aluguer do novo artigo (em meses): "))
+                novo_periodoaluguer = int(input("\nEspecifique o periodo de aluguer do novo artigo (em meses): "))
                 if novo_periodoaluguer > 0:
                     validar = input("\nConfirma o periodo de aluguer do artigo a introduzir? (S/N)\n")
                     if validar == "S" or validar == "s":
@@ -1462,7 +1458,7 @@ def adicionarartigo_admin():
         #Adicionar preço
         while True:
             try:
-                novo_preco = float(input("Especifique o preço do novo artigo: "))
+                novo_preco = float(input("\nEspecifique o preço do novo artigo: "))
                 if novo_preco >= 0:
                     validar = input("\nConfirma o preço do artigo a introduzir? (S/N)\n")
                     if validar == "S" or validar == "s":
@@ -1490,7 +1486,7 @@ def adicionarartigo_admin():
                     if id_ator is not None:                         #Ator pertence à base de dados
                         cur.execute(f"INSERT INTO artigo_atores(artigo_id, atores_id) VALUES ({id_artigo},{id_ator[0]});")
                         print(f"\n{ator} participa agora neste artigo")
-                        mais = input("Pretende adicionar mais atores ao artigo?(S/N):\n")
+                        mais = input("\nPretende adicionar mais atores ao artigo?(S/N):\n")
                         if mais == "S" or mais == "s":
                             print("")
                         elif mais == "N" or mais == "n":
@@ -1508,7 +1504,7 @@ def adicionarartigo_admin():
                                     cur.execute(f"SELECT id FROM atores WHERE nome LIKE '%{nome_novo_ator}' AND nome LIKE '{nome_novo_ator}%'")
                                     existe = cur.fetchall()
                                     if len(existe) == 0 :
-                                        check = input("Confirma os dados do novo ator a adicionar à base de dados?(S/N):\n")
+                                        check = input("\nConfirma os dados do novo ator a adicionar à base de dados?(S/N):\n")
                                     else:
                                         print("\nAtor/atriz já registado/a na base de dados")
                                         novo = False
@@ -1530,7 +1526,7 @@ def adicionarartigo_admin():
                                 print("")
 
                         while True:
-                            mais = input("Pretende adicionar mais atores ao artigo?(S/N):\n")
+                            mais = input("\nPretende adicionar mais atores ao artigo?(S/N):\n")
                             if mais == "N" or mais == "n":
                                 out = True
                                 break
@@ -1548,7 +1544,7 @@ def adicionarartigo_admin():
 
                 tentativas = 3
                 while tentativas > 0:
-                    confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                    confirmar = getpass("\nIntroduza a sua chave de administrador para confirmar a introdução do artigo:\n")
                     cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                     chave = cur.fetchone()[0]
                     if confirmar == chave:
@@ -1567,7 +1563,7 @@ def adicionarartigo_admin():
             elif perguntar == "N" or perguntar == "n":
                 tentativas = 3
                 while tentativas > 0:
-                    confirmar = getpass("Introduza a sua chave de administrador para confirmar a introdução do artigo:\n")
+                    confirmar = getpass("\nIntroduza a sua chave de administrador para confirmar a introdução do artigo:\n")
                     cur.execute(f"SELECT chave FROM administrador WHERE utilizador_id = {utilizador_atual}")
                     chave = cur.fetchone()[0]
                     if confirmar == chave:
@@ -1795,7 +1791,7 @@ def estatisticas_admin():
 def alterarsaldo_admin():
     while True:
         print("------------------------------- ALTERAR SALDO -------------------------------\n")
-        cur.execute("SELECT utilizador_id, nome, saldo FROM cliente, utilizador WHERE cliente.utilizador_id = utilizador.id;")
+        cur.execute("SELECT utilizador_id, nome, saldo FROM cliente, utilizador WHERE cliente.utilizador_id = utilizador.id ORDER BY utilizador_id ASC;")
         dados = cur.fetchall()
         if len(dados) == 0:
             print("\n\t\t   Não existem clientes registados\n\n\t\t   || A VOLTAR AO MENU ||")
@@ -1861,7 +1857,7 @@ def alterarsaldo_admin():
 #                                                                INÍCIO
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #Iniciar programa
-alugar_cliente()
+inicio()
 
 
 #==========================================================================================================================

@@ -977,6 +977,8 @@ def alugar_cliente():
                             else:
                                 try:
                                     cur.execute(f"INSERT INTO aluguer (id, data, ativo, artigo_id, cliente_utilizador_id, preco_aluguer) VALUES (DEFAULT, CURRENT_TIMESTAMP, True, {artdet}, {utilizador_atual},{preco});")
+                                    saldo_disponivel = saldo_atual - preco
+                                    cur.execute(f"UPDATE cliente SET saldo = {saldo_disponivel} WHERE utilizador_id = {utilizador_atual}")
                                     conn.commit()
                                     print("\nALUGADO!\n")
                                     break

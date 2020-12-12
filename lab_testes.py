@@ -16,38 +16,75 @@ cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 utilizador_atual = 2    #Utilizador com login efetuado
 #==========================================================================================================================
 
-#Registar mensagem na tabela leitura
+def alugar():
+    while True:
+        print("---------------------------------ARTIGOS PARA ALUGAR----------------------------------------")
+        cur.execute(f"SELECT id, titulo, tipo FROM artigo EXCEPT SELECT artigo.id, titulo, tipo FROM artigo, aluguer WHERE artigo.id = aluguer.artigo_id AND ativo = true AND aluguer.cliente_utilizador_id = {utilizador_atual};")
+        for linha in cur.fetchall():
+            id, titulo, tipo = linha
+            print("Título: ", titulo, "| Tipo: ", tipo, "| ID: ", id)
 
-cur.execute(f"SELECT DISTINCT leitura.mensagem_id, corpo, administrador_utilizador_id FROM mensagem, leitura, mensagem_administrador WHERE leitura.lida IS NOT NULL AND leitura.cliente_utilizador_id = {utilizador_atual} AND mensagem.id = leitura.mensagem_id ORDER BY mensagem_id ASC;")
-dados = cur.fetchall()
-print(dados)
-print(len(dados))
-for i in range(len(dados)):
-    print(dados[i])
-    print(dados[i][0])  #ID MENSAGEM
-    print(dados[i][1])  #CORPO
-    print(dados[i][2])  #ID ADMIN
+        try:
+            artdet = int(input("Que artigo quer alugar?(ID): "));
+            try:
+                cur.execute(f"SELECT titulo, tipo, realizador, produtor, ano from artigo where id = '{artdet}';")
+                detalhes = cur.fetchone()
+                if detalhes is None:
+                    print(f"Não existe um artigo com o ID {artdet}")
+                else:
+                    print("\nDetalhes do artigo: ")
+                    print(
+                        f"Título: {detalhes[0]} | Tipo: {detalhes[1]} | Realizador: {detalhes[2]} | Produtor: {detalhes[3]} | Ano: {detalhes[4]} ")
 
-# #ID da mensagem
-# id_mensagem = dados[ind][0]
-#
-# #Corpo da mensagem
-# if len(dados[ind][1]) > 15:
-#     corpo = ""
-#     for i in range(12):
-#         corpo += dados[ind][1][1]
-#     corpo += "  [...]"
-# else:
-#     corpo = dados[ind][1]
-#
-# #Administrador que enviou a mensagem
-# admin_id = dados[ind][2]
-# cur.execute(f"SELECT nome FROM utilizador WHERE id = {admin_id}")
-# admin = cur.fetchone()[0]
-#
-# #Mostrar resulado
-# print(f"ID: {id_mensagem} |Remetente: {admin} |Corpo: {corpo}")
-# dados = cur.fetchone()
+                    try:
+                        cur.execute(
+                            f"SELECT nome FROM atores, artigo_atores WHERE atores.id = artigo_atores.atores_id and artigo_id = {artdet};")
+                        nomes = cur.fetchone()
+                        if nomes is None:
+                            print("Atores : N/A")
+                        else:
+                            print(f"Atores: ")
+                            while nomes is not None:
+                                print(" ", *nomes)
+                                nomes = cur.fetchone()
+                    except:
+                        print("Atores : N/A")
+
+                    print("\n----------------------------Condições de aluguer--------------------------------------\n")
+
+                    cur.execute(f"SELECT periodo_de_aluguer, preco from artigo, historico_precos where artigo.id = {artdet} and historico_precos.atual = True and historico_precos.artigo_id = {artdet};")
+
+                    for linha in cur.fetchall():
+                        periodo_de_aluguer, preco = linha
+                        print("Período de aluguer(em meses): ", periodo_de_aluguer, "| Preço: ", preco, " €")
+
+                    while True:
+
+                        det1 = input("""Pretende ALUGAR?
+
+                        Responda (S|N): """)
+
+                        if det1 == "S" or det1 == "s":
+
+                            #cur.execute(f"INSERT INTO aluguer (id, data, ativo, artigo_id, cliente_utilizador_id) VALUES (DEFAULT, CURRENT_TIMESTAMP, True, (SELECT id from artigo where id = '{artdet}'), '{utilizador_atual}');")
+
+                            print("\nALUGADO!\n")
+                            
+                            break
+
+                        elif det1 == "N" or det1 == "n":
+                            break
+                        else:
+                            print("Inválido\nTenta outra vez")
+
+            except ValueError:
+                print("ERRO!")
+        except ValueError:
+            print("Valor de ID inválido")
+
+
+
+alugar()
 #==========================================================================================================================
 # Fecha a ligação à base de dados
 cur.close()

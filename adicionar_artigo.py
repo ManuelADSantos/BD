@@ -30,6 +30,7 @@ def admin_adicionarartigo():
                 print("\nTitulo descartado")
             else:
                 print("\nOpção inválida")
+        print(novo_titulo)
 
         #Tipo
         while True:
@@ -50,6 +51,7 @@ def admin_adicionarartigo():
                     print("\nOpção inválida")
             else:
                 print("\nOpção inválida")
+        print(novo_tipo)
 
         #Realizador
         while True:
@@ -61,6 +63,8 @@ def admin_adicionarartigo():
                 print("\nRealizador descartado")
             else:
                 print("\nOpção inválida")
+        print(novo_realizador)
+
 
         #Produtor
         while True:
@@ -72,6 +76,7 @@ def admin_adicionarartigo():
                 print("\nProdutor descartado")
             else:
                 print("\nOpção inválida")
+        print(novo_produtor)
 
         #Ano
         while True:
@@ -92,6 +97,8 @@ def admin_adicionarartigo():
                         print("\nOpção inválida")
             except ValueError:
                 print("Valor não válido")
+        print(novo_ano)
+
 
         #Periodo de aluguer
         while True:
@@ -109,6 +116,7 @@ def admin_adicionarartigo():
                     print("Valor inválido")
             except:
                 print("\nValor inválido")
+        print(novo_periodoaluguer)
 
         #Adicionar preço
         while True:
@@ -126,10 +134,12 @@ def admin_adicionarartigo():
                     print("Valor inválido")
             except:
                 print("\nValor inválido")
+        print(novo_preco)
 
         #Efetuar Registo
         try:
             cur.execute(f"INSERT INTO artigo(id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer) VALUES (DEFAULT, '{novo_titulo}', '{novo_tipo}', '{novo_realizador}', '{novo_produtor}', {novo_ano}, {novo_periodoaluguer}) RETURNING id;")
+            print("CHECK")
             id_artigo = cur.fetchone()[0]
             cur.execute(f"INSERT INTO historico_precos(id,preco,entrada_em_vigor,atual,artigo_id) VALUES (DEFAULT, {novo_preco}, CURRENT_TIMESTAMP, True , {id_artigo});")
             perguntar = input("Pretende associar atores a este artigo? (S/N)\n")

@@ -4,6 +4,7 @@ from passlib.hash import sha256_crypt
 from getpass import getpass
 import os
 import datetime
+from datetime import date
 
 #==========================================================================================================================
 # Estabelecer ligação à base de dados
@@ -145,43 +146,43 @@ def menu_cliente():
     while True:
         print("\n-------------------------------------MENU CLIENTE-----------------------------------------------\n")
 
-        escolha_admin = input("""
+        escolha_cliente = input("""
                               1 - Ver Saldo
                               2 - Pesquisa
                               3 - Mensagens
+                              4 - Alugueres
                               V|v- Logout
 
         Ver: """)
 
-        if escolha_admin == "1":
+        if escolha_cliente == "1":
             saldos_cliente()
 
-        if escolha_admin == "2":
+        if escolha_cliente == "2":
             pesquisar_clientes()
 
-        if escolha_admin == "3":
+        if escolha_cliente == "3":
             mensagens_cliente()
 
-        elif escolha_admin == "V" or escolha_admin== "v":
+        if escolha_cliente == "4":
+            alugueres_cliente()
+
+        elif escolha_cliente == "V" or escolha_cliente == "v":
             print("LOGOUT")
             return
-
-        else:
-            print("Inválido\nTenta outra vez")
-
+        
 
 #==========================================================================================================================
 #Menu CLIENTE - Saldo
 def saldos_cliente():
     #-----------------------------------------------MENU SALDO-----------------------------------------------------
-    saldos = True
 
     #PEDE AO CLIENTE QUE TIPO DE PESQUISA QUER EFETUAR
-    while saldos:
+    while True:
 
         print("----------------------MENU SALDO---------------------\n")
 
-        cur.execute(f"SELECT saldo from cliente where utilizador_id = '{utilizador_atual}';")
+        cur.execute(f"SELECT saldo FROM cliente WHERE utilizador_id = '{utilizador_atual}';")
 
         s1 = cur.fetchone()
 
@@ -196,11 +197,11 @@ def saldos_cliente():
 
         #Volta ao menu anterior
         if s == "V" or s == "v":
-            saldos = False
+            return
 
         else:
-            print("Inválido")
-            print("Tenta outra vez")
+            print("Inválido\nTente outra vez")
+
 
 
 #==========================================================================================================================
@@ -778,6 +779,31 @@ def pesquisa_user():
     return
 
 
+# -------------------------------------Lista de Alugueres----------------------------
+def alugueres_cliente():
+    print("-------------------------------------------ALUGUERES------------------------------------------")
+
+    cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, artigo.tipo, aluguer.preco_aluguer from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}'and aluguer.ativo = True ORDER by aluguer.data DESC;")
+
+    print("\n......................Ativos.......................")
+    for linha in cur.fetchall():
+        titulo, periodo_de_aluguer, data, tipo, preco = linha
+        print("Título: ", titulo, " | Tipo: ", tipo," | Data de aluguer: ", data.strftime("%d/%m/%Y %H:%M"), "| Periodo de Aluguer: ", periodo_de_aluguer, " meses | Preço de Aluguer: ", preco, "€")
+
+    cur.execute(
+        f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, artigo.tipo, aluguer.preco_aluguer from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}' and aluguer.ativo = False ORDER by aluguer.data DESC;")
+
+    print("\n.....................Não Ativos......................")
+    for linha in cur.fetchall():
+        titulo, periodo_de_aluguer, data, tipo, preco = linha
+        print("Título: ", titulo, " | Tipo: ", tipo," | Data de aluguer: ", data.strftime("%d/%m/%Y %H:%M"), "| Periodo de Aluguer: ", periodo_de_aluguer, " meses | Preço de Aluguer: ", preco, "€")
+
+    print("\n\t\t\t\tv/V - Voltar ao Menu Cliente")
+    while True:
+        voltar = input("\t\t\t\t\t       ")
+        if voltar == "v" or voltar == "V":
+            break
+    return
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #                                                               ADMIN
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\

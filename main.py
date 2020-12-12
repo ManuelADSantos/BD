@@ -151,6 +151,7 @@ def menu_cliente():
                               2 - Pesquisa
                               3 - Mensagens
                               4 - Alugueres
+                              5 - Catálogo Completo
                               V|v- Logout
 
         Ver: """)
@@ -167,10 +168,13 @@ def menu_cliente():
         if escolha_cliente == "4":
             alugueres_cliente()
 
+        if escolha_cliente == "5":
+            lista_cliente()
+
         elif escolha_cliente == "V" or escolha_cliente == "v":
             print("LOGOUT")
             return
-        
+
 
 #==========================================================================================================================
 #Menu CLIENTE - Saldo
@@ -798,12 +802,57 @@ def alugueres_cliente():
         titulo, periodo_de_aluguer, data, tipo, preco = linha
         print("Título: ", titulo, " | Tipo: ", tipo," | Data de aluguer: ", data.strftime("%d/%m/%Y %H:%M"), "| Periodo de Aluguer: ", periodo_de_aluguer, " meses | Preço de Aluguer: ", preco, "€")
 
+    print("\n....................Total gasto em alugueres.................")
+    cur.execute(f"SELECT coalesce(sum(preco_aluguer), 0) from aluguer where cliente_utilizador_id = {utilizador_atual};")
+    p = cur.fetchone()
+    print("Total:", *p, " €")
+
+    print("\n....................Total gasto em Documentários alugados.................")
+    cur.execute(f"SELECT coalesce(sum(preco_aluguer), 0) from aluguer join artigo on aluguer.artigo_id = artigo.id where artigo.tipo like '%documentario%' and cliente_utilizador_id = {utilizador_atual};")
+    p1 = cur.fetchone()
+    print("Documentários:", *p1, " €")
+
+    print("\n....................Total gasto em Filmes alugados.................")
+    cur.execute(f"SELECT coalesce(sum(preco_aluguer), 0) from aluguer join artigo on aluguer.artigo_id = artigo.id where artigo.tipo like '%filme%' and cliente_utilizador_id = {utilizador_atual};")
+    p2 = cur.fetchone()
+    print("Filmes:", *p2, " €")
+
+    print("\n....................Total gasto em Séries alugadas.................")
+    cur.execute(f"SELECT coalesce(sum(preco_aluguer), 0) from aluguer join artigo on aluguer.artigo_id = artigo.id where artigo.tipo like '%serie%' and cliente_utilizador_id = {utilizador_atual};")
+    p3 = cur.fetchone()
+    print("Séries:", *p3, " €")
+
+
     print("\n\t\t\t\tv/V - Voltar ao Menu Cliente")
     while True:
         voltar = input("\t\t\t\t\t       ")
         if voltar == "v" or voltar == "V":
             break
     return
+
+
+#-------------------------------------Catálogo/ Lista de todos os artigos-------------------------------------------------
+def lista_cliente():
+    while True:
+        print("---------------------------------CATÁLOGO DE ARTIGOS----------------------------------------")
+
+        cur.execute("SELECT id, titulo, tipo from artigo ORDER BY tipo ASC, titulo ASC;")
+
+        for linha in cur.fetchall():
+            id, titulo, tipo = linha
+            print("Título: ", titulo, "| Tipo: ", tipo, "| ID: ", id)
+
+        det = input("\n\t\t\t\t\tV|v - Voltar\n\n\t\t\t\t\t    ")
+
+        # Volta ao Inventário
+        if det == "V" or det == "v":
+            print("A VOLTAR AO MENU CLIENTE")
+            return
+        # Input não válido
+        else:
+            print("\n\t\t\t\t\tInválido")
+            print("\t\t\t\t     Tenta outra vez\n")
+
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #                                                               ADMIN
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\

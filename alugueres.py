@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+from datetime import date
 
 # A função connect permite estabelecer uma ligação a uma base de dados
 # Verifique se a password é igual à que escolheu na instalação de PostgreSQL
@@ -9,29 +10,38 @@ conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=p
 # Cria um objecto (cursor) que permite executar operações sobre a base de dados
 cur = conn.cursor()
 
-utilizador_atual = 1
+utilizador_atual = 2
 
-def alugueres():
+def alugueres_cliente():
     print("-------------------------------------------ALUGUERES------------------------------------------")
 
-    cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, aluguer.ativo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}'and aluguer.ativo = True ORDER by aluguer.data DESC;")
+    cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, artigo.tipo, aluguer.preco_aluguer from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}'and aluguer.ativo = True ORDER by aluguer.data DESC;")
 
-    print("......................Ativos.......................")
+    print("\n......................Ativos.......................")
     for linha in cur.fetchall():
-        titulo, periodo_de_aluguer, data, ativo = linha
-        print("Título: ", titulo, " | Data: ", data, "| Periodo de Aluguer: ", periodo_de_aluguer, " | Ativo?:", ativo)
+        titulo, periodo_de_aluguer, data, tipo, preco = linha
+        print("Título: ", titulo, " | Tipo: ", tipo," | Data de aluguer: ", data.strftime("%d/%m/%Y %H:%M"), "| Periodo de Aluguer: ", periodo_de_aluguer, " meses | Preço de Aluguer: ", preco, "€")
 
     cur.execute(
-        f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, aluguer.ativo from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}' and aluguer.ativo = False ORDER by aluguer.data DESC;")
+        f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, artigo.tipo, aluguer.preco_aluguer from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}' and aluguer.ativo = False ORDER by aluguer.data DESC;")
 
-    print(".....................Não Ativos......................")
+    print("\n.....................Não Ativos......................")
     for linha in cur.fetchall():
-        titulo, periodo_de_aluguer, data, ativo = linha
-        print("Título: ", titulo, " | Data: ", data, "| Periodo de Aluguer: ", periodo_de_aluguer, " | Ativo?:", ativo)
+        titulo, periodo_de_aluguer, data, tipo, preco = linha
+        print("Título: ", titulo, " | Tipo: ", tipo," | Data de aluguer: ", data.strftime("%d/%m/%Y %H:%M"), "| Periodo de Aluguer: ", periodo_de_aluguer, " meses | Preço de Aluguer: ", preco, "€")
 
+    print("\n\t\t\t\tv/V - Voltar ao Menu Cliente")
+    while True:
+        voltar = input("\t\t\t\t\t       ")
+        if voltar == "v" or voltar == "V":
+            break
+    return
+
+
+#====================================================================================================================================================
 def lista():
     while True:
-        print("---------------------------------INVENTÁRIO DE ARTIGOS----------------------------------------")
+        print("---------------------------------CATÁLOGO DE ARTIGOS----------------------------------------")
 
         cur.execute("SELECT id, titulo, tipo from artigo ORDER BY tipo ASC, titulo ASC;")
 
@@ -93,7 +103,7 @@ def lista():
 
                             while True:
 
-                                det1 = input("""Prentende ALUGAR?
+                                det1 = input("""Pretende ALUGAR?
 
                                 Responda (S|N): """)
 
@@ -103,7 +113,7 @@ def lista():
 
                                     print("\nALUGADO!\n")
 
-                                    alugueres()
+                                    alugueres_cliente()
 
                                     break
 

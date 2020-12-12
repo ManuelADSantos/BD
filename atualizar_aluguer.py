@@ -27,15 +27,14 @@ def atualizar_aluguer():
         id = linha[1]
         periodo_de_aluguer = linha[2]
         validade = data + relativedelta(months =+ periodo_de_aluguer)
-        print("ID: ",id,"| Período de aluguer: ", periodo_de_aluguer, "| Data: ", data, "|Fim: ", validade)
-        if(date.today() < validade.date()):
+        if(date.today() > validade.date()):
             try:
                 cur.execute(f"UPDATE aluguer SET ativo = false WHERE id = id")
-                print("ACABOU")
                 conn.commit()
             except:
                 conn.rollback()
 
+    return
 atualizar_aluguer()
 
 

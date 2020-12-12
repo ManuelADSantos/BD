@@ -11,7 +11,7 @@ from datetime import date
 conn = psycopg2.connect("host=localhost dbname=postgres user=postgres password=postgres")
 
 # Criar cursor
-cur = conn.cursor()
+cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 #==========================================================================================================================
 #Variáveis globais
@@ -150,8 +150,9 @@ def menu_cliente():
                               1 - Ver Saldo
                               2 - Pesquisa
                               3 - Mensagens
-                              4 - Alugueres
+                              4 - Dados sobre Alugueres
                               5 - Catálogo Completo
+                              6 - Alugar
                               V|v- Logout
 
         Ver: """)
@@ -169,6 +170,9 @@ def menu_cliente():
             alugueres_cliente()
 
         if escolha_cliente == "5":
+            lista_cliente()
+
+        if escolha_cliente == "6":
             lista_cliente()
 
         elif escolha_cliente == "V" or escolha_cliente == "v":
@@ -785,7 +789,7 @@ def pesquisa_user():
 
 # -------------------------------------Lista de Alugueres----------------------------
 def alugueres_cliente():
-    print("-------------------------------------------ALUGUERES------------------------------------------")
+    print("-------------------------------------------DADOS SOBRE OS ALUGUERES------------------------------------------")
 
     cur.execute(f"SELECT artigo.titulo, artigo.periodo_de_aluguer, aluguer.data, artigo.tipo, aluguer.preco_aluguer from artigo join aluguer on artigo.id = aluguer.artigo_id join cliente on aluguer.cliente_utilizador_id = cliente.utilizador_id where cliente.utilizador_id = '{utilizador_atual}'and aluguer.ativo = True ORDER by aluguer.data DESC;")
 
@@ -852,6 +856,9 @@ def lista_cliente():
         else:
             print("\n\t\t\t\t\tInválido")
             print("\t\t\t\t     Tenta outra vez\n")
+
+
+#-------------------------------------Catálogo/ Lista de todos os artigos-------------------------------------------------
 
 #/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 #                                                               ADMIN

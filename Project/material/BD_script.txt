@@ -1,0 +1,117 @@
+CREATE TABLE utilizador (
+	id	 SERIAL,
+	email	 VARCHAR(512) UNIQUE NOT NULL,
+	password VARCHAR(512) NOT NULL,
+	nome	 VARCHAR(512),
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE administrador (
+	chave	 VARCHAR(512) UNIQUE NOT NULL,
+	utilizador_id BIGINT,
+	PRIMARY KEY(utilizador_id)
+);
+
+CREATE TABLE cliente (
+	saldo	 FLOAT(8) NOT NULL,
+	utilizador_id BIGINT,
+	PRIMARY KEY(utilizador_id)
+);
+
+CREATE TABLE artigo (
+	id		 SERIAL,
+	titulo		 VARCHAR(512) NOT NULL,
+	tipo		 VARCHAR(512) NOT NULL,
+	realizador	 VARCHAR(512) NOT NULL,
+	produtor		 VARCHAR(512) NOT NULL,
+	ano		 INTEGER NOT NULL,
+	periodo_de_aluguer BIGINT NOT NULL,
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE atores (
+	id	 SERIAL,
+	nome VARCHAR(512) NOT NULL,
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE aluguer (
+	id			 SERIAL,
+	data			 TIMESTAMP NOT NULL,
+	ativo		 BOOL NOT NULL,
+	preco_aluguer	 FLOAT(8) NOT NULL,
+	artigo_id		 BIGINT NOT NULL,
+	cliente_utilizador_id BIGINT NOT NULL,
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE historico_precos (
+	id		 SERIAL,
+	preco		 FLOAT(8) NOT NULL,
+	entrada_em_vigor TIMESTAMP NOT NULL,
+	atual		 BOOL NOT NULL,
+	artigo_id	 BIGINT NOT NULL,
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE mensagem (
+	id	 SERIAL,
+	corpo TEXT NOT NULL,
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE leitura (
+	lida			 TIMESTAMP,
+	mensagem_id		 BIGINT NOT NULL,
+	cliente_utilizador_id BIGINT NOT NULL,
+	PRIMARY KEY(cliente_utilizador_id, mensagem_id)
+);
+
+CREATE TABLE cliente_mensagem (
+	cliente_utilizador_id BIGINT,
+	mensagem_id		 BIGINT,
+	PRIMARY KEY(cliente_utilizador_id,mensagem_id)
+);
+
+CREATE TABLE mensagem_administrador (
+	mensagem_id		 BIGINT,
+	administrador_utilizador_id BIGINT,
+	PRIMARY KEY(mensagem_id,administrador_utilizador_id)
+);
+
+CREATE TABLE artigo_atores (
+	artigo_id BIGINT,
+	atores_id BIGINT,
+	PRIMARY KEY(artigo_id,atores_id)
+);
+
+ALTER TABLE administrador ADD CONSTRAINT administrador_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizador(id);
+ALTER TABLE cliente ADD CONSTRAINT cliente_fk1 FOREIGN KEY (utilizador_id) REFERENCES utilizador(id);
+ALTER TABLE aluguer ADD CONSTRAINT aluguer_fk1 FOREIGN KEY (artigo_id) REFERENCES artigo(id);
+ALTER TABLE aluguer ADD CONSTRAINT aluguer_fk2 FOREIGN KEY (cliente_utilizador_id) REFERENCES cliente(utilizador_id);
+ALTER TABLE historico_precos ADD CONSTRAINT historico_precos_fk1 FOREIGN KEY (artigo_id) REFERENCES artigo(id);
+ALTER TABLE leitura ADD CONSTRAINT leitura_fk1 FOREIGN KEY (mensagem_id) REFERENCES mensagem(id);
+ALTER TABLE leitura ADD CONSTRAINT leitura_fk2 FOREIGN KEY (cliente_utilizador_id) REFERENCES cliente(utilizador_id);
+ALTER TABLE cliente_mensagem ADD CONSTRAINT cliente_mensagem_fk1 FOREIGN KEY (cliente_utilizador_id) REFERENCES cliente(utilizador_id);
+ALTER TABLE cliente_mensagem ADD CONSTRAINT cliente_mensagem_fk2 FOREIGN KEY (mensagem_id) REFERENCES mensagem(id);
+ALTER TABLE mensagem_administrador ADD CONSTRAINT mensagem_administrador_fk1 FOREIGN KEY (mensagem_id) REFERENCES mensagem(id);
+ALTER TABLE mensagem_administrador ADD CONSTRAINT mensagem_administrador_fk2 FOREIGN KEY (administrador_utilizador_id) REFERENCES administrador(utilizador_id);
+ALTER TABLE artigo_atores ADD CONSTRAINT artigo_atores_fk1 FOREIGN KEY (artigo_id) REFERENCES artigo(id);
+ALTER TABLE artigo_atores ADD CONSTRAINT artigo_atores_fk2 FOREIGN KEY (atores_id) REFERENCES atores(id);
+
+CREATE OR REPLACE FUNCTION mudar_estado_preco()
+RETURNS TRIGGER AS $$
+	BEGIN
+		UPDATE historico_precos 
+		SET atual = False
+		WHERE historico_precos.artigo_id = NEW.artigo_id 
+		AND atual = True;
+		RETURN NEW;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER ativo_preco
+  BEFORE INSERT
+  ON historico_precos
+  FOR EACH ROW
+  EXECUTE FUNCTION mudar_estado_preco();

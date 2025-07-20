@@ -1,0 +1,141 @@
+ ____      __  
+|    \    |  |
+|     \   |  |
+|  |\  \  |  |
+|  | \  \ |  |
+|  |  \  \|  |
+|  |   \     |
+|__|    \____|
+
+INSERT INTO artigo(id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer)VALUES (1, 'banana', 'filme', 'ze ez', 'ze ze', 2020, 2);
+INSERT INTO artigo(id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer)VALUES (2, 'ananas', 'serie', 'jo jo', 'tim tim', 2000, 6);
+INSERT INTO artigo(id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer)VALUES (3, 'ola ola', 'filme', 'jo jo', 'gigi gi', 1990, 2);
+INSERT INTO artigo(id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer)VALUES (4, 'ww1', 'serie', 'qwerty y', 'ytrewq q', 2020, 6);
+INSERT INTO artigo(id, titulo, tipo, realizador, produtor, ano, periodo_de_aluguer)VALUES (5, 'qwerty', 'serie', 'ze ez', 'tim tim', 2000, 6);
+
+SELECT * FROM utilizador
+SELECT * FROM cliente
+SELECT * FROM administrador
+SELECT * FROM artigo
+SELECT * FROM historico_precos
+SELECT * FROM mensagem
+SELECT * FROM cliente_mensagem 
+SELECT * FROM mensagem_administrador
+SELECT * FROM artigo_atores
+SELECT * FROM atores
+SELECT * FROM aluguer
+SELECT * FROM leitura
+
+INSERT INTO aluguer(id, data, ativo, artigo_id, cliente_utilizador_id, preco_aluguer) VALUES (DEFAULT, CURRENT_TIMESTAMP, true, 2, 2, 4.5);
+INSERT INTO aluguer(id, data, ativo, artigo_id, cliente_utilizador_id, preco_aluguer) VALUES (DEFAULT, CURRENT_TIMESTAMP, false, 1, 3, 2.5);
+INSERT INTO utilizador(id, email, password, nome) VALUES (DEFAULT, 'manel', '1234', 'Manuel') RETURNING id;
+INSERT INTO cliente(utilizador_id, saldo) VALUES (DEFAULT,20);
+INSERT INTO administrador(utilizador_id, chave) VALUES (1,'XPTO');
+
+DELETE FROM utilizador
+DELETE FROM utilizador WHERE id=4
+DELETE FROM cliente
+DELETE FROM cliente WHERE utilizador_id=4
+DELETE FROM aluguer
+
+ALTER SEQUENCE utilizador_id_seq RESTART WITH 4;
+
+INSERT INTO atores(id, nome)
+VALUES (1, 'tom c');
+INSERT INTO atores(id, nome)
+VALUES (2, 'kim k');
+INSERT INTO atores(id, nome)
+VALUES (3, 'rdj');
+
+
+DROP FUNCTION mudar_estado;
+DROP TRIGGER ativa_preco ON historico_precos;
+
+CREATE OR REPLACE FUNCTION mudar_estado_preco()
+RETURNS TRIGGER AS $$
+	BEGIN
+		UPDATE historico_precos 
+		SET atual = False
+		WHERE historico_precos.artigo_id = NEW.artigo_id 
+		AND atual = True;
+		RETURN NEW;
+	END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER ativo_preco
+  BEFORE INSERT
+  ON historico_precos
+  FOR EACH ROW
+  EXECUTE FUNCTION mudar_estado_preco();
+
+ALTER TABLE aluguer
+ADD COLUMN preco_aluguer FLOAT(8) NOT NULL;
+ 
+ DROP TABLE color;
+ CREATE TABLE color (
+    color_id SERIAL,
+    color_name VARCHAR NOT NULL
+);
+SELECT * FROM color
+INSERT INTO color(color_id, color_name) VALUES (DEFAULT,'Vermelho')
+
+
+SELECT nome FROM atores, artigo_atores WHERE atores.id = artigo_atores.atores_id and artigo_id = 39;
+
+
+SELECT titulo, tipo, realizador, produtor, ano from artigo where id = 39
+
+
+SELECT mensagem_id FROM cliente_mensagem WHERE cliente_utilizador_id = 2
+EXCEPT
+SELECT mensagem_id FROM leitura WHERE lida IS NOT NULL AND cliente_utilizador_id = 2;
+
+SELECT * FROM cliente_mensagem WHERE cliente_utilizador_id = 2
+INSERT INTO leitura(lida, mensagem_id, cliente_utilizador_id) VALUES (CURRENT_TIMESTAMP, 18, 2);
+
+SELECT mensagem_id, corpo FROM cliente_mensagem, mensagem WHERE cliente_utilizador_id = 2 AND cliente_mensagem.mensagem_id = mensagem.id ORDER BY mensagem_id ASC;
+
+SELECT nome FROM utilizador WHERE id = (SELECT administrador_utilizador_id FROM mensagem_administrador WHERE mensagem_id = 18);
+
+ALTER TABLE leitura ADD PRIMARY KEY (mensagem_id, cliente_utilizador_id)
+ALTER TABLE leitura DROP CONSTRAINT primary_key_constraint;
+SELECT * FROM leitura
+
+
+
+
+
+
+
+
+
+
+INSERT INTO administrador(chave,utilizador_id) VALUES ('CHAVE',1);
+
+--Procuras--------------------------------------------------------
+SELECT * FROM cliente;
+SELECT * FROM administrador;
+SELECT * FROM utilizador;
+
+SELECT * FROM leitura;
+SELECT * FROM mensagem;
+SELECT * FROM cliente_mensagem;
+SELECT * FROM mensagem_administrador;
+
+SELECT * FROM artigo;
+SELECT * FROM atores;
+SELECT * FROM aluguer;
+SELECT * FROM historico_precos;
+SELECT * FROM artigo_atores;
+
+--Random-----------------------------------------------------------------
+UPDATE administrador SET chave = 'CHAVE1' WHERE utilizador_id = 1;
+UPDATE utilizador SET email = 'cliente1@gmail.com' WHERE id = 2;
+
+DELETE FROM cliente WHERE utilizador_id = 1;
+
+SELECT cliente_mensagem.mensagem_id, corpo, lida FROM cliente_mensagem, mensagem, leitura WHERE cliente_mensagem.cliente_utilizador_id = 2 AND cliente_mensagem.mensagem_id = mensagem.id AND leitura.lida IS NULL ORDER BY cliente_mensagem.mensagem_id ASC;
+
+SELECT nome FROM utilizador WHERE id = (SELECT administrador_utilizador_id FROM mensagem_administrador WHERE mensagem_id = 1)
+
+DELETE FROM leitura WHERE mensagem_id = 1;
